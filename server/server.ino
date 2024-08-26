@@ -3,7 +3,7 @@
 #include <ESPmDNS.h>     // no escribir ip 
 #include <Preferences.h> //guardad coniguracion
 #include "config.h"      // credenciales wifi
-//#include "union.h"      // partes de la pagina
+#include "union.h"      // partes de la pagina
 #include <Arduino.h>  // tareas paraleo
 
 #include <Wire.h>             //leer corriente
@@ -37,10 +37,172 @@ DHT dht(DHT_PIN, DHT11);
 WebServer server(80);
 Preferences p;
 
+TaskHandle_t Task1;
+TaskHandle_t Task2;
+SemaphoreHandle_t mutex;
 
-const int nlec = 8;
-volatile float lec[nlec];
+const int nConf = 9;    // numero de lectoruas configuracion en web
+const int nAng = 5;     // numero de entradas analogas
+const int nSal = 10;     // numero de salidas
+const int nBot = 4;     // numero de botones web
+const int nBat = 6;     // numero de baterias
+const int nLec = 8;     // numero de lecturas
+const int pwmf = 1000;
 
+volatile float lec[nLec];
+volatile float conf[nConf];       // lectura configuracion web [ovp, ovpr, uvp, uvpr, maxCC, ...]
+volatile bool boton[nBot];       // lectura configuracion web [carga, descara, balance, emergncia]
+float g[nLec + 1] = {1,1,1,1,1,1,1,1,1};       // Ganancia de cada entrada analogica
+//const float g[nLec]= {567.3,221.9,219.8,126.1,109.2,75.58,1,1}; // ganancia ajustada
+float bat[nBat];
+int  cc = 255;
+int dd = 255;
+
+
+void handleNotFound() {
+    digitalWrite(LED,1);
+    String message = "File Not Found\n\n";
+    message += "URI: ";
+    message += server.uri();
+    message += "\nMethod: ";
+    message += (server.method() == HTTP_GET) ? "GET" : "POST";
+    message += "\nArguments: ";
+    message += server.args();
+    message += "\n";
+
+    for (uint8_t i = 0; i < server.args(); i++) {
+        message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    }
+
+    server.send(404, "text/plain", message);
+    digitalWrite(LED,0);
+}
+//--------------Fin raices pagina web ------//
+//-------------- Inicio funciones web -------//
+void configuracion(){
+    digitalWrite(LED,1);
+    p.begin("my-app", false);
+    String cade = server.arg("plain");
+    String par[nConf];
+    int npar = 0;
+    while (cade.length() > 0){
+        int posComa = cade.indexOf(",");
+        if(posComa != -1){
+        par[npar] = cade.substring(0, posComa);
+        cade = cade.substring(posComa + 1);
+        }else{
+        par[npar] = cade;
+        cade = "";
+        }
+        npar++;
+    }
+    for( int i = 0; i < nConf; i++ ){
+        conf[i] = par[i].toFloat();
+        String key = "conf" + String(i);
+        const char* keyc = key.c_str();
+        p.putFloat(keyc, conf[i]);
+    }
+    p.end();
+    digitalWrite(LED,0);
+    server.send(200,"text/plain","todo correcto");
+}
+void ganancia(){
+    digitalWrite(LED,1);
+    p.begin("my-app", false);
+    String cade = server.arg("plain");
+    String par[nLec + 1];
+    int npar = 0;
+    while (cade.length() > 0){
+        int posComa = cade.indexOf(",");
+        if(posComa != -1){
+        par[npar] = cade.substring(0, posComa);
+        cade = cade.substring(posComa + 1);
+        }else{
+        par[npar] = cade;
+        cade = "";
+        }
+        npar++;
+    }
+    float gt[nLec + 1];
+    for( int i = 0; i <= nLec; i++ ){
+        gt[i] = par[i].toFloat();
+        Serial.print(gt[i]);
+        g[i] = gt[i];
+        String key = "gain" + String(i);
+        const char* keyc = key.c_str();
+        p.putFloat(keyc, g[i]);
+    }
+    p.end();
+    digitalWrite(LED,0);
+    server.send(200,"text/plain","todo correcto");
+}
+void botones(){
+    digitalWrite(LED,1);
+    p.begin("my-app", false);
+    String cade = server.arg("plain");
+    String par[nBot];
+    int npar = 0;
+    while (cade.length() > 0){
+        int posComa = cade.indexOf(",");
+        if(posComa != -1){
+        par[npar] = cade.substring(0, posComa);
+        cade = cade.substring(posComa + 1);
+        }else{
+        par[npar] = cade;
+        cade = "";
+        }
+        npar++;
+    }
+    for( int i = 0; i < nBot; i++ ){
+        boton[i] = (par[i] == "true");
+        String key = "boton" + String(i);
+        const char* keyc = key.c_str();
+        p.putBool(keyc, boton[i]);
+    }
+    p.end();
+    server.send(200,"text/plain","todo correcto");
+    digitalWrite(LED,0);  
+}
+void handleInformacion(){
+    digitalWrite(LED,1);
+    String data = "";
+    if (g[8] < 1 ){
+        for (int i = 0; i < nBat; i++){
+            data += String(bat[i],2)+",";
+        }
+    }else{
+        for (int i = 0; i < nBat; i++){
+            data += String(lec[i],2)+",";
+        }
+    }
+    data += String((lec[5]),1)+",";
+    data += String(lec[6],2)+","; //corriente
+    data += String(lec[7],0) ; //temperatura 
+    server.send(200, "text/plain",data); 
+    digitalWrite(LED,0);
+}
+void database(){
+    p.begin("my-app", false);
+    for (int i = 0; i < nConf; i++) {
+        String key = "conf" + String(i);
+        const char* keyc = key.c_str();
+        conf[i] = p.getFloat(keyc, 0.0);
+    }
+    for (int i = 0; i < nBot; i++) {
+        String key = "boton" + String(i);
+        const char* keyc = key.c_str();
+        boton[i] = p.getBool(keyc, false);
+    }
+    p.end();
+    String data = "";
+    for(int i=0; i<nBot ; i++){
+        data += String(boton[i])+",";
+    }
+    for (int i = 0; i<nConf; i++ ){
+        data += String(conf[i]) + ",";
+    }
+    server.send(200, "text/plain",data);
+}
 
 /*         C -  B - A
 MB1 IO2    0 - 1 - 0
@@ -72,8 +234,68 @@ void leer() {
   }
 }
 
+void setupServer() {
+    server.on("/", [](){
+        server.send(200, "text/html", paginaHTML);
+    });
+    server.on("/style.css", [](){
+        server.send(200, "text/css", paginaCSS);
+    });
+    server.on("/config", HTTP_POST, []() {
+        configuracion();
+    });
+    server.on("/gain", HTTP_POST, []() {
+        ganancia();
+    });
+    server.on("/boton", HTTP_POST, []() {
+        botones();
+    });
+    server.on("/informacion", HTTP_GET, []() {
+        handleInformacion();
+    });
+    server.on("/data", HTTP_GET, []() {
+        database();
+    });
+    server.onNotFound(handleNotFound);
+    server.begin();
+    Serial.println("HTTP server started");
+}
 
+void Task1code(void * pvParameters) {
+    TickType_t xLastWakeTime;
+    const TickType_t xFrequency = pdMS_TO_TICKS(1000); // 1 segundo de ciclo total
 
+    xLastWakeTime = xTaskGetTickCount();
+
+    for(;;) {
+        // Ejecutar leer()
+        if(xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
+            leer();
+            xSemaphoreGive(mutex);
+        }
+        // Esperar 500ms
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
+        // Ejecutar control()
+        if(xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
+            //control();
+            xSemaphoreGive(mutex);
+        }
+        // Esperar hasta completar 1 segundo desde el inicio del ciclo
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+    }
+}
+
+void Task2code(void * pvParameters) {
+    setupServer(); // Función para configurar el servidor
+
+    for(;;) {
+        if(xSemaphoreTake(mutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+            server.handleClient();
+            xSemaphoreGive(mutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1)); // Pequeña pausa para no saturar el CPU
+    }
+}
 
 void wifi1(){
   WiFi.mode(WIFI_STA);
@@ -117,6 +339,30 @@ void initsd() {
   Serial.println("Tarjeta SD inicializada correctamente");
 }
 
+void variables(){
+    p.begin("my-app", false);
+    for (int i = 0; i < nConf; i++) {
+        String key = "conf" + String(i);
+        const char* keyc = key.c_str();
+        conf[i] = p.getFloat(keyc, 0.0);
+        Serial.print(conf[i]);
+    }
+    Serial.println();
+    for (int i = 0; i <= nLec; i++) {
+        String key = "gain" + String(i);
+        const char* keyc = key.c_str();
+        g[i] = p.getFloat(keyc, 0.0);
+        Serial.print(g[i]);
+    }
+    Serial.println();
+    for (int i = 0; i < nBot; i++) {
+        String key = "boton" + String(i);
+        const char* keyc = key.c_str();
+        boton[i] = p.getBool(keyc, false);
+    }
+    p.end();
+}
+
 void initpin() {
   for (int i = 0; i < sizeof(pin) / sizeof(pin[0]); i++) {
     pinMode(pin[i], OUTPUT);
@@ -131,6 +377,7 @@ void setup(void) {
     delay(1);
   }
   Serial.println("Hello!");
+  variables();
   wifi1();
   dns1();
   delay(1000);
@@ -139,21 +386,41 @@ void setup(void) {
   initsd();
   initpin();
 
+  mutex = xSemaphoreCreateMutex();
+  // Crea las tareas en diferentes núcleos
+  xTaskCreatePinnedToCore(
+      Task1code,    // Función de la tarea
+      "Task1",      // Nombre de la tarea
+      10000,        // Tamaño del stack
+      NULL,         // Parámetro de entrada
+      1,            // Prioridad de la tarea
+      &Task1,       // Manejador de la tarea
+      0);           // Núcleo al que se asigna la tarea
+
+  xTaskCreatePinnedToCore(
+      Task2code,    // Función de la tarea
+      "Task2",      // Nombre de la tarea
+      10000,        // Tamaño del stack
+      NULL,         // Parámetro de entrada
+      1,            // Prioridad de la tarea
+      &Task2,       // Manejador de la tarea
+      1);           // Núcleo al que se asigna la tarea
+
 }
 
 
 void loop(void) {
 
-  delay(1000);
+/*  delay(1000);
 
   leer();
-  for (int i = 0; i < nlec; i++) {
+  for (int i = 0; i < nLec; i++) {
     Serial.print(lec[i]);
     Serial.print("  ");
   }
   File archivo = SD.open("/datos.txt", FILE_APPEND);
   if (archivo) {
-    for (int i = 0; i < nlec; i++) {
+    for (int i = 0; i < nLec; i++) {
       archivo.print(lec[i]);
       archivo.print(",");
     }
@@ -163,5 +430,5 @@ void loop(void) {
   } else {
     Serial.println("Error al abrir el archivo para escribir");
   }
-  delay(1000);
+  delay(1000);  */
 }
