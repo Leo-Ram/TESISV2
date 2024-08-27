@@ -214,24 +214,130 @@ MB6 IO5    1 - 0 - 1
 */
 
 void canal(uint8_t valor) {
-  digitalWrite(MXC, valor & 0x01);
-  digitalWrite(MXB, (valor >> 1) & 0x01);
-  digitalWrite(MXA, (valor >> 2) & 0x01);
+    digitalWrite(MXC, valor & 0x01);
+    digitalWrite(MXB, (valor >> 1) & 0x01);
+    digitalWrite(MXA, (valor >> 2) & 0x01);
 }
 
 void leer() {
-  static const uint8_t canales[] = { 2, 1, 4, 6, 7, 5 };
-  for (uint8_t i = 0; i < 6; i++) {
-    canal(canales[i]);
-    lec[i] = analogRead(ANG);
-  }
+    static const uint8_t canales[] = { 2, 1, 4, 6, 7, 5 };
+    for (uint8_t i = 0; i < 6; i++) {
+        canal(canales[i]);
+        lec[i] = analogRead(ANG);
+    }
 
-  lec[6] = ina219.getCurrent_mA();
+    lec[6] = ina219.getCurrent_mA();
 
-  float temp = dht.readTemperature();
-  if (!isnan(temp)) {
-    lec[7] = temp;
-  }
+    float temp = dht.readTemperature();
+    if (!isnan(temp)) {
+        lec[7] = temp;
+    }
+    for (int i = 0; i < 8; i++) {
+        lec[i] = lec[i] / g[i];
+    }
+    bat[0] = lec[0];
+    for (int i = 1; i < nBat; i++){
+        bat[i] = lec[i] - lec[i-1];  
+    }
+}
+
+void apagar (){
+    digitalWrite(B1, LOW);
+    digitalWrite(B2, LOW);
+    digitalWrite(B3, LOW);
+    digitalWrite(B4, LOW);
+    digitalWrite(B5, LOW);
+    digitalWrite(B6, LOW);
+}
+
+void control() {
+
+    if (isTemperatureInvalid() || isEmergencyActive()) {
+        shutDownSystem();
+        return;
+    }
+
+    bool batteryStates[5] = {true, true, true, true, true};
+    bool balanceStates[nBat] = {false};
+    updateBatteryStates(batteryStates, balanceStates);
+
+    handleCharging(batteryStates);
+    handleDischarging(batteryStates);
+    handleBalancing(balanceStates,batteryStates);
+}
+
+bool isTemperatureInvalid() {
+    return (lec[7] < conf[7]) || (lec[7] > conf[8]);
+}
+
+bool isEmergencyActive() {
+    return boton[3];
+}
+
+void shutDownSystem() {
+    apagar();
+    analogWrite(OVP, 0);
+    analogWrite(UVP, isEmergencyActive() ? 255 : 0);
+}
+
+void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
+    for (int i = 0; i < nBat; i++) {
+        batteryStates[0] &= (bat[i] < conf[0]);
+        batteryStates[1] &= (bat[i] < conf[1]);
+        batteryStates[2] &= (bat[i] > conf[2]);
+        batteryStates[3] &= (bat[i] > conf[3]);
+        batteryStates[4] &= (bat[i] > conf[4]);
+        balanceStates[i] = (bat[i] > conf[4]);
+    }
+}
+
+void handleCharging(bool batteryStates[]) {
+    if (batteryStates[0] && boton[0] && batteryStates[1]) {
+        if (lec[6] > conf[5] && cc > 0) {
+            while (lec[6] > conf[5] && cc > 0) {
+                cc = max(0, cc - 5);
+                lec[6] = analogRead(ANG);
+                analogWrite(OVP, cc);
+            }
+        } else {
+            cc = min(255, cc + 5);
+            analogWrite(OVP, cc);
+        }
+    } else {
+        analogWrite(OVP, 0);
+    }
+}
+
+void handleDischarging(bool batteryStates[]) {
+    if (batteryStates[2] && boton[1] && batteryStates[3]) {
+        if (lec[6] < -conf[6] && dd > 0) {
+            while (lec[6] < -conf[6] && dd > 0) {
+                digitalWrite(UVP, 1);
+                dd = max(0, dd - 5);
+                lec[6] = analogRead(ANG);
+                analogWrite(UVP, dd);
+            }
+        } else {
+            dd = min(255, dd + 5);
+            analogWrite(UVP, dd);
+        }
+    } else {
+        analogWrite(UVP, 0);
+    }
+}
+
+void handleBalancing(bool balanceStates[], bool batteryStates[]) {
+    if (boton[2] && !batteryStates[4]) {
+        digitalWrite(B1, balanceStates[0] ? HIGH : LOW);
+        digitalWrite(B2, balanceStates[1] ? HIGH : LOW);
+        digitalWrite(B3, balanceStates[2] ? HIGH : LOW);
+        digitalWrite(B4, balanceStates[3] ? HIGH : LOW);
+        digitalWrite(B5, balanceStates[4] ? HIGH : LOW);
+        digitalWrite(B6, balanceStates[5] ? HIGH : LOW);
+        
+    } else {
+        apagar();
+    }
 }
 
 void setupServer() {
@@ -277,7 +383,7 @@ void Task1code(void * pvParameters) {
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
         // Ejecutar control()
         if(xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
-            //control();
+            control();
             xSemaphoreGive(mutex);
         }
         // Esperar hasta completar 1 segundo desde el inicio del ciclo
@@ -371,64 +477,62 @@ void initpin() {
   pinMode(ANG, INPUT);
 }
 
-void setup(void) {
-  Serial.begin(115200);
-  while (!Serial) {
-    delay(1);
-  }
-  Serial.println("Hello!");
-  variables();
-  wifi1();
-  dns1();
-  delay(1000);
-  initina();
-  delay(2000);
-  initsd();
-  initpin();
-
-  mutex = xSemaphoreCreateMutex();
-  // Crea las tareas en diferentes núcleos
-  xTaskCreatePinnedToCore(
-      Task1code,    // Función de la tarea
-      "Task1",      // Nombre de la tarea
-      10000,        // Tamaño del stack
-      NULL,         // Parámetro de entrada
-      1,            // Prioridad de la tarea
-      &Task1,       // Manejador de la tarea
-      0);           // Núcleo al que se asigna la tarea
-
-  xTaskCreatePinnedToCore(
-      Task2code,    // Función de la tarea
-      "Task2",      // Nombre de la tarea
-      10000,        // Tamaño del stack
-      NULL,         // Parámetro de entrada
-      1,            // Prioridad de la tarea
-      &Task2,       // Manejador de la tarea
-      1);           // Núcleo al que se asigna la tarea
-
-}
-
-
-void loop(void) {
-
-/*  delay(1000);
-
-  leer();
-  for (int i = 0; i < nLec; i++) {
-    Serial.print(lec[i]);
-    Serial.print("  ");
-  }
-  File archivo = SD.open("/datos.txt", FILE_APPEND);
-  if (archivo) {
-    for (int i = 0; i < nLec; i++) {
-      archivo.print(lec[i]);
-      archivo.print(",");
+void escribirsd(){
+  File dataFile = SD.open("datos.txt", FILE_WRITE);
+  if (dataFile) {
+    for (int i = 0; i < 8; i++) {
+      if (i < 6){
+        dataFile.print(bat[i]);
+        dataFile.print(",");
+      }else{
+        dataFile.print(lec[i]);
+        dataFile.print(",");
+      }  
     }
-    archivo.println();
-    archivo.close();
-    Serial.println("Se escribió en el archivo");
+    dataFile.println(bat[0]);
+    dataFile.close();
+    Serial.println("Data saved");
   } else {
-    Serial.println("Error al abrir el archivo para escribir");
+    Serial.println("Error opening data file");
   }
-  delay(1000);  */
 }
+
+void setup(void) {
+    Serial.begin(115200);
+    while (!Serial) {
+        delay(1);
+    }
+    Serial.println("Hello!");
+    variables();
+    wifi1();
+    dns1();
+    delay(1000);
+    //initina();
+    delay(2000);
+    initsd();
+    initpin();
+
+    mutex = xSemaphoreCreateMutex();
+    // Crea las tareas en diferentes núcleos
+    xTaskCreatePinnedToCore(
+        Task1code,    // Función de la tarea
+        "Task1",      // Nombre de la tarea
+        10000,        // Tamaño del stack
+        NULL,         // Parámetro de entrada
+        1,            // Prioridad de la tarea
+        &Task1,       // Manejador de la tarea
+        0);           // Núcleo al que se asigna la tarea
+
+    xTaskCreatePinnedToCore(
+        Task2code,    // Función de la tarea
+        "Task2",      // Nombre de la tarea
+        10000,        // Tamaño del stack
+        NULL,         // Parámetro de entrada
+        1,            // Prioridad de la tarea
+        &Task2,       // Manejador de la tarea
+        1);           // Núcleo al que se asigna la tarea
+
+}
+
+
+void loop(void) {}
