@@ -509,7 +509,7 @@ void setup(void) {
     delay(1000);
     //initina();
     delay(2000);
-    initsd();
+    //initsd();
     initpin();
 
     mutex = xSemaphoreCreateMutex();
