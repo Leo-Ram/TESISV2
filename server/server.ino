@@ -14,21 +14,21 @@
 
 #include <DHT.h>              //sensor de temperatura
 
-#define CS_PIN 10           
-#define DHT_PIN 18
-#define ANG 1
-#define MXA 21
-#define MXB 47
-#define MXC 48
-#define LED 17
-#define B1 16
-#define B2 15
-#define B3 2
-#define B4 41
-#define B5 5
-#define B6 4
-#define OVP 6
-#define UVP 7
+#define CS_PIN 5           
+#define DHT_PIN 13 // s
+#define ANG 36
+#define MXA 27
+#define MXB 14
+#define MXC 12
+#define LED 2
+#define B1 32
+#define B2 33
+#define B3 15
+#define B4 4
+#define B5 16
+#define B6 17
+#define OVP 25
+#define UVP 26
 
 const int pin[] = { MXA, MXB, MXC, LED, B1, B2, B3, B4, B5, B6, OVP, UVP };
 Adafruit_INA219 ina219(0x41);
@@ -220,12 +220,11 @@ void canal(uint8_t valor) {
 }
 
 void leer() {
-    static const uint8_t canales[] = { 2, 1, 4, 6, 7, 5 };
+    static const uint8_t canales[] = { 4, 6, 7, 5, 0, 3 };
     for (uint8_t i = 0; i < 6; i++) {
         canal(canales[i]);
         lec[i] = analogRead(ANG);
     }
-
     lec[6] = ina219.getCurrent_mA();
 
     float temp = dht.readTemperature();
