@@ -31,7 +31,7 @@
 #define UVP 26
 
 const int pin[] = { MXA, MXB, MXC, LED, B1, B2, B3, B4, B5, B6, OVP, UVP };
-Adafruit_INA219 ina219(0x41);
+Adafruit_INA219 ina219(0x40);
 DHT dht(DHT_PIN, DHT11);
 
 WebServer server(80);
@@ -55,8 +55,8 @@ volatile bool boton[nBot];       // lectura configuracion web [carga, descara, b
 float g[nLec + 1] = {1,1,1,1,1,1,1,1,1};       // Ganancia de cada entrada analogica
 //const float g[nLec]= {567.3,221.9,219.8,126.1,109.2,75.58,1,1}; // ganancia ajustada
 float bat[nBat];
-int  cc = 255;
-int dd = 255;
+int  cc = 0;
+int dd = 0;
 
 
 void handleNotFound() {
@@ -178,6 +178,7 @@ void handleInformacion(){
     data += String((lec[5]),1)+",";
     data += String(lec[6],2)+","; //corriente
     data += String(lec[7],0) ; //temperatura 
+    //Serial.println(data);
     server.send(200, "text/plain",data); 
     digitalWrite(LED,0);
 }
@@ -205,28 +206,29 @@ void database(){
 }
 
 /*         C -  B - A
-MB1 IO2    0 - 1 - 0
-MB2 IO1    0 - 0 - 1
-MB3 IO4    1 - 0 - 0
-MB4 IO6    1 - 1 - 0
-MB5 IO7    1 - 1 - 1
-MB6 IO5    1 - 0 - 1
+MB1 IO4    1 - 0 - 0
+MB2 IO6    1 - 1 - 0
+MB3 IO7    1 - 1 - 1
+MB4 IO5    1 - 0 - 1
+MB5 IO0    0 - 0 - 0
+MB6 IO3    0 - 1 - 1
 */
 
 void canal(uint8_t valor) {
-    digitalWrite(MXC, valor & 0x01);
+    digitalWrite(MXA, valor & 0x01);
     digitalWrite(MXB, (valor >> 1) & 0x01);
-    digitalWrite(MXA, (valor >> 2) & 0x01);
+    digitalWrite(MXC, (valor >> 2) & 0x01);
 }
 
 void leer() {
-    static const uint8_t canales[] = { 4, 6, 7, 5, 0, 3 };
-    for (uint8_t i = 0; i < 6; i++) {
+    static const uint8_t canales[] = { 4, 6, 7, 5, 0, 3 , 1 };
+    for (uint8_t i = 0; i < 7; i++) {
         canal(canales[i]);
+        vTaskDelay(pdMS_TO_TICKS(100));;
         lec[i] = analogRead(ANG);
     }
-    lec[6] = ina219.getCurrent_mA();
-
+   // Serial.println();
+    //lec[6] = ina219.getCurrent_mA();
     float temp = dht.readTemperature();
     if (!isnan(temp)) {
         lec[7] = temp;
@@ -238,6 +240,7 @@ void leer() {
     for (int i = 1; i < nBat; i++){
         bat[i] = lec[i] - lec[i-1];  
     }
+    //escribirsd();
 }
 
 void apagar (){
@@ -254,15 +257,17 @@ void control() {
     if (isTemperatureInvalid() || isEmergencyActive()) {
         shutDownSystem();
         return;
+    }else {
+        bool batteryStates[5] = {true, true, true, true, true};
+        bool balanceStates[nBat] = {false};
+        updateBatteryStates(batteryStates, balanceStates);
+
+        handleCharging(batteryStates);
+        handleDischarging(batteryStates);
+        handleBalancing(balanceStates,batteryStates);
+
     }
 
-    bool batteryStates[5] = {true, true, true, true, true};
-    bool balanceStates[nBat] = {false};
-    updateBatteryStates(batteryStates, balanceStates);
-
-    handleCharging(batteryStates);
-    handleDischarging(batteryStates);
-    handleBalancing(balanceStates,batteryStates);
 }
 
 bool isTemperatureInvalid() {
@@ -275,8 +280,8 @@ bool isEmergencyActive() {
 
 void shutDownSystem() {
     apagar();
-    analogWrite(OVP, 0);
-    analogWrite(UVP, isEmergencyActive() ? 255 : 0);
+    analogWrite(OVP, 255);
+    analogWrite(UVP, isTemperatureInvalid() ? 255 : 0);
 }
 
 void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
@@ -292,36 +297,40 @@ void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
 
 void handleCharging(bool batteryStates[]) {
     if (batteryStates[0] && boton[0] && batteryStates[1]) {
-        if (lec[6] > conf[5] && cc > 0) {
-            while (lec[6] > conf[5] && cc > 0) {
-                cc = max(0, cc - 5);
+        if (lec[6] > conf[5] && cc < 255) {
+            canal(1);
+            vTaskDelay(pdMS_TO_TICKS(100));;
+            while (lec[6] > conf[5] && cc < 255) {
+                cc = min(255, cc + 5);
                 lec[6] = analogRead(ANG);
                 analogWrite(OVP, cc);
             }
         } else {
-            cc = min(255, cc + 5);
+            cc = max(0, cc - 5);
             analogWrite(OVP, cc);
         }
     } else {
-        analogWrite(OVP, 0);
+        analogWrite(OVP, 255);
     }
 }
 
 void handleDischarging(bool batteryStates[]) {
     if (batteryStates[2] && boton[1] && batteryStates[3]) {
-        if (lec[6] < -conf[6] && dd > 0) {
-            while (lec[6] < -conf[6] && dd > 0) {
+        if (lec[6] < -conf[6] && dd < 255) {
+            canal(1);
+            vTaskDelay(pdMS_TO_TICKS(100));;
+            while (lec[6] < -conf[6] && dd < 255) {
                 digitalWrite(UVP, 1);
-                dd = max(0, dd - 5);
+                dd = min(255, dd + 5);
                 lec[6] = analogRead(ANG);
                 analogWrite(UVP, dd);
             }
         } else {
-            dd = min(255, dd + 5);
+            dd = max(0, dd - 5);
             analogWrite(UVP, dd);
         }
     } else {
-        analogWrite(UVP, 0);
+        analogWrite(UVP, 255);
     }
 }
 
@@ -477,18 +486,20 @@ void initpin() {
 }
 
 void escribirsd(){
-  File dataFile = SD.open("datos.txt", FILE_WRITE);
+  File dataFile = SD.open("/datos.txt", FILE_WRITE);
   if (dataFile) {
+    dataFile.seek(dataFile.size());
     for (int i = 0; i < 8; i++) {
-      if (i < 6){
+      if ( i<6 ){
         dataFile.print(bat[i]);
         dataFile.print(",");
       }else{
         dataFile.print(lec[i]);
         dataFile.print(",");
-      }  
+      }
     }
-    dataFile.println(bat[0]);
+    
+    dataFile.println(); 
     dataFile.close();
     Serial.println("Data saved");
   } else {
