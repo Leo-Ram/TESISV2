@@ -227,6 +227,7 @@ void leer() {
         vTaskDelay(pdMS_TO_TICKS(100));;
         lec[i] = analogRead(ANG);
     }
+    lec[6] = lec[6] -2920;
    // Serial.println();
     //lec[6] = ina219.getCurrent_mA();
     float temp = dht.readTemperature();
