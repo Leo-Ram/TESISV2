@@ -7,7 +7,7 @@
 #include <Arduino.h>  // tareas paraleo
 
 #include <Wire.h>             //leer corriente
-#include <Adafruit_INA219.h>  //leer corriente
+#include "INA226.h"  //leer corriente
 
 #include <SPI.h>              //usar puerto SPI para SD
 #include <SD.h>               //usar SD
@@ -31,7 +31,7 @@
 #define UVP 26
 
 const int pin[] = { MXA, MXB, MXC, LED, B1, B2, B3, B4, B5, B6, OVP, UVP };
-Adafruit_INA219 ina219(0x40);
+INA226 INA(0x40);
 DHT dht(DHT_PIN, DHT11);
 
 WebServer server(80);
@@ -221,15 +221,14 @@ void canal(uint8_t valor) {
 }
 
 void leer() {
-    static const uint8_t canales[] = { 4, 6, 7, 5, 0, 3 , 1 };
-    for (uint8_t i = 0; i < 7; i++) {
+    static const uint8_t canales[] = { 4, 6, 7, 5, 0, 3 };
+    for (uint8_t i = 0; i < 6; i++) {
         canal(canales[i]);
         vTaskDelay(pdMS_TO_TICKS(100));;
         lec[i] = analogRead(ANG);
     }
-    lec[6] = lec[6] -2920;
-   // Serial.println();
-    //lec[6] = ina219.getCurrent_mA();
+    lec[6] = INA.getCurrent_mA();
+    lec[6] = lec[6] / 6.1;
     float temp = dht.readTemperature();
     if (!isnan(temp)) {
         lec[7] = temp;
@@ -241,7 +240,7 @@ void leer() {
     for (int i = 1; i < nBat; i++){
         bat[i] = lec[i] - lec[i-1];  
     }
-    //escribirsd();
+    escribirsd();
 }
 
 void apagar (){
@@ -299,13 +298,17 @@ void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
 void handleCharging(bool batteryStates[]) {
     if (batteryStates[0] && boton[0] && batteryStates[1]) {
         if (lec[6] > conf[5] && cc < 255) {
-            canal(1);
-            vTaskDelay(pdMS_TO_TICKS(100));;
             while (lec[6] > conf[5] && cc < 255) {
                 cc = min(255, cc + 5);
-                lec[6] = analogRead(ANG);
+                lec[6] = INA.getCurrent_mA();
+                lec[6] = lec[6] / 6.1;
+                Serial.print(" cc ");
+                Serial.print(cc);
+                Serial.print(" lec = ");
+                Serial.println(lec[6]);
                 analogWrite(OVP, cc);
             }
+            Serial.println(" ------ ");
         } else {
             cc = max(0, cc - 5);
             analogWrite(OVP, cc);
@@ -318,12 +321,11 @@ void handleCharging(bool batteryStates[]) {
 void handleDischarging(bool batteryStates[]) {
     if (batteryStates[2] && boton[1] && batteryStates[3]) {
         if (lec[6] < -conf[6] && dd < 255) {
-            canal(1);
-            vTaskDelay(pdMS_TO_TICKS(100));;
             while (lec[6] < -conf[6] && dd < 255) {
                 digitalWrite(UVP, 1);
                 dd = min(255, dd + 5);
-                lec[6] = analogRead(ANG);
+                lec[6] = INA.getCurrent_mA();
+                lec[6] = lec[6] / 6.1;
                 analogWrite(UVP, dd);
             }
         } else {
@@ -437,11 +439,12 @@ void dns1(){
 }
 
 void initina() {
-  while (!ina219.begin()) {
+  Wire.begin();
+  while (!INA.begin()) {
     Serial.println("Failed to find INA219 chip, retrying...");
     delay(1000);
   }
-  ina219.setCalibration_32V_2A();
+  INA.setMaxCurrentShunt(5,0.01,true);
 
   Serial.println("Measuring voltage and current with INA219 ...");
 }
@@ -502,7 +505,7 @@ void escribirsd(){
     
     dataFile.println(); 
     dataFile.close();
-    Serial.println("Data saved");
+    //Serial.println("Data saved");
   } else {
     Serial.println("Error opening data file");
   }
@@ -518,9 +521,9 @@ void setup(void) {
     wifi1();
     dns1();
     delay(1000);
-    //initina();
+    initina();
     delay(2000);
-    //initsd();
+    initsd();
     initpin();
 
     mutex = xSemaphoreCreateMutex();
