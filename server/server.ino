@@ -55,8 +55,10 @@ volatile bool boton[nBot];       // lectura configuracion web [carga, descara, b
 float g[nLec + 1] = {1,1,1,1,1,1,1,1,1};       // Ganancia de cada entrada analogica
 //const float g[nLec]= {567.3,221.9,219.8,126.1,109.2,75.58,1,1}; // ganancia ajustada
 float bat[nBat];
-int  cc = 0;
-int dd = 0;
+int  cc = 255;
+int dd = 255;
+bool bancc = false;
+bool bandd = false;
 
 
 void handleNotFound() {
@@ -295,45 +297,71 @@ void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
     }
 }
 
-void handleCharging(bool batteryStates[]) {
-    if (batteryStates[0] && boton[0] && batteryStates[1]) {
-        if (lec[6] > conf[5] && cc < 255) {
-            while (lec[6] > conf[5] && cc < 255) {
-                cc = min(255, cc + 5);
-                lec[6] = INA.getCurrent_mA();
-                lec[6] = lec[6] / 6.1;
-                Serial.print(" cc ");
-                Serial.print(cc);
-                Serial.print(" lec = ");
-                Serial.println(lec[6]);
-                analogWrite(OVP, cc);
-            }
-            Serial.println(" ------ ");
-        } else {
-            cc = max(0, cc - 5);
-            analogWrite(OVP, cc);
+int ajuste(int x,float cf,bool m){
+    lec[6] = INA.getCurrent_mA();
+    lec[6] = lec[6] / g[6];
+    float xlec = abs(lec[6]);
+    if (xlec > cf){
+        while((xlec > cf) & (x < 255) ){
+            x = min(255,x+1);
+            if(m){analogWrite(OVP,x);
+            }else{analogWrite(UVP,x);}
+            lec[6] = INA.getCurrent_mA();
+            lec[6] = lec[6] / g[6];
+            xlec = abs(lec[6]);
+        } 
+    }else if(xlec < (cf-50)){
+        while ((xlec < (cf-50) ) & (x > 0)){
+            x = max(0,x-1);
+            if(m){analogWrite(OVP,x);
+            }else{analogWrite(UVP,x);}
+            lec[6] = INA.getCurrent_mA();
+            lec[6] = lec[6] / g[6];
+            xlec = abs(lec[6]);
         }
-    } else {
-        analogWrite(OVP, 255);
+    }else{
+        if(m){analogWrite(OVP,x);
+        }else{analogWrite(UVP,x);}
+    }
+    return x;
+}
+
+void handleCharging(bool batteryStates[]) {
+    if(boton[0]){
+        if(batteryStates[0] & batteryStates[1]){
+            cc = ajuste(cc,conf[5],true);
+            bancc = false;
+        }else if(batteryStates[0] & !batteryStates[1]){
+            if(!bancc){
+                cc = ajuste(cc,conf[5],true);
+            }else{
+                analogWrite(OVP,255);
+            }
+        }else{
+            analogWrite(OVP,255);
+            bancc = true;
+        }
+    }else{
+        analogWrite(OVP,255);
     }
 }
 
 void handleDischarging(bool batteryStates[]) {
-    if (batteryStates[2] && boton[1] && batteryStates[3]) {
-        if (lec[6] < -conf[6] && dd < 255) {
-            while (lec[6] < -conf[6] && dd < 255) {
-                digitalWrite(UVP, 1);
-                dd = min(255, dd + 5);
-                lec[6] = INA.getCurrent_mA();
-                lec[6] = lec[6] / 6.1;
-                analogWrite(UVP, dd);
+    if(boton[1]){
+        if(batteryStates[2] & batteryStates[3]){
+            dd = ajuste(dd,conf[6],false);
+        }else if(batteryStates[2] & !batteryStates[3]){
+            if(!bandd){
+                dd = ajuste(dd,conf[6],false);
+            }else{
+                analogWrite(UVP,255);
             }
-        } else {
-            dd = max(0, dd - 5);
-            analogWrite(UVP, dd);
+        }else{
+            analogWrite(UVP,255);
+            bandd = true;
         }
-    } else {
-        analogWrite(UVP, 255);
+    }else{
+        analogWrite(UVP,255);
     }
 }
 
