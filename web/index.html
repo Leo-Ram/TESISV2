@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>BMS</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+    <header>
+        <div>
+            <h2 class='header'>UNIVERSIDAD DE NARIÑO</h2>
+        </div>
+    </header>
+    <main>
+        <div class='container-title'>
+            <h1>BMS-local</h1>
+        </div>
+        <div class='container-q'>
+            <div class='container-button' id='container-button-id'>
+                <div class='button'>
+                    <input type='checkbox' class='button-input' id='carga'>
+                    <label for='carga' class='button-label'>Carga</label>
+                </div>
+                <div class='button'>
+                    <input type='checkbox' class='button-input' id='descarga'>
+                    <label for='descarga' class='button-label'>Descarga</label>
+                </div>
+                <div class='button'>
+                    <input type='checkbox' class='button-input' id='balance'>
+                    <label for='balance' class='button-label'>Balance</label>
+                </div>
+                <div class='button'>
+                    <input type='checkbox' class='button-input' id='emergencia'>
+                    <label for='emergencia' class='button-label'>Emergencia</label>
+                </div>
+            </div>
+        </div>
+        <div class='container-r'>
+            <h2 class='h2-sub'>Voltajes en las baterias</h2>
+            <div class='container-read' id='container-read-id'>
+            </div>
+        </div>
+        <div class='container-r'>
+            <h2 class='h2-sub'>Configuracion</h2>
+            <form class='form'></form>
+                <div class='container-form' id='container-form-id'>              
+                </div>
+                <div class='container-input enviar'>
+                    <input type='button' value='enviar' id='form-button'>
+                </div>
+            </form>
+        </div>
+        <div class="container-r">
+            <span id="disp"> = </span>
+            <div id="disp-box">
+                <input type="number" class="form-input input-conf" value="588">
+                <input type="number" class="form-input input-conf" value="272">
+                <input type="number" class="form-input input-conf" value="199.5">
+                <input type="number" class="form-input input-conf" value="143.6">
+                <input type="number" class="form-input input-conf" value="124">
+                <input type="number" class="form-input input-conf" value="101.7">
+                <input type="number" class="form-input input-conf" value="1">
+                <input type="number" class="form-input input-conf" value="1">
+                <input type="number" class="form-input input-conf" value="0">
+                <input type="number" class="form-input input-conf" value="0">
+                <input type="button" class="form-input" value="Guardar" id="volta">
+            </div>      
+        </div>
+    </main>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

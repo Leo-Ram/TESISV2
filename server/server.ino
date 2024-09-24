@@ -1,4 +1,5 @@
 #include <WiFi.h>        //red wifi
+#include <esp_wifi.h>
 #include <WebServer.h>   // web comunicacion
 #include <ESPmDNS.h>     // no escribir ip 
 #include <Preferences.h> //guardad coniguracion
@@ -13,6 +14,8 @@
 #include <SD.h>               //usar SD
 
 #include <DHT.h>              //sensor de temperatura
+
+#include <time.h>        //contar tiempo
 
 #define CS_PIN 5           
 #define DHT_PIN 13 // s
@@ -52,7 +55,7 @@ const int pwmf = 1000;
 volatile float lec[nLec];
 volatile float conf[nConf];       // lectura configuracion web [ovp, ovpr, uvp, uvpr, maxCC, ...]
 volatile bool boton[nBot];       // lectura configuracion web [carga, descara, balance, emergncia]
-float g[nLec + 1] = {1,1,1,1,1,1,1,1,1};       // Ganancia de cada entrada analogica
+float g[nLec + 2] = {1,1,1,1,1,1,1,1,1,0};       // Ganancia de cada entrada analogica
 //const float g[nLec]= {567.3,221.9,219.8,126.1,109.2,75.58,1,1}; // ganancia ajustada
 float bat[nBat];
 int  cc = 255;
@@ -60,6 +63,21 @@ int dd = 255;
 bool bancc = false;
 bool bandd = false;
 
+unsigned long ti; // tiempo inicial
+time_t ta;    // tiempo actual
+struct tm *timeinfo;  // timepo para guardar
+unsigned long tp;  // tiempo pasado
+
+void tiempoin(){
+    struct tm tiempo = {0};
+    tiempo.tm_year = 2024 - 1900;  // Años desde 1900
+    tiempo.tm_mon = 0;             // 0-11 (0 = Enero)
+    tiempo.tm_mday = 1;            // 1-31
+    tiempo.tm_hour = 0;
+    tiempo.tm_min = 0;
+    tiempo.tm_sec = 0;
+    tp = mktime(&tiempo);
+}
 
 void handleNotFound() {
     digitalWrite(LED,1);
@@ -112,7 +130,7 @@ void ganancia(){
     digitalWrite(LED,1);
     p.begin("my-app", false);
     String cade = server.arg("plain");
-    String par[nLec + 1];
+    String par[nLec + 2];
     int npar = 0;
     while (cade.length() > 0){
         int posComa = cade.indexOf(",");
@@ -134,6 +152,16 @@ void ganancia(){
         const char* keyc = key.c_str();
         p.putFloat(keyc, g[i]);
     }
+    
+    g[9] = par[9].toFloat();
+    if (g[9] > 1){
+      Serial.println("apagar wifi");
+        Serial.println("apagar wifi");
+        WiFi.disconnect(true);
+        WiFi.mode(WIFI_OFF);
+        esp_wifi_stop();
+    }
+
     p.end();
     digitalWrite(LED,0);
     server.send(200,"text/plain","todo correcto");
@@ -518,25 +546,28 @@ void initpin() {
 }
 
 void escribirsd(){
-  File dataFile = SD.open("/datos.txt", FILE_WRITE);
-  if (dataFile) {
-    dataFile.seek(dataFile.size());
-    for (int i = 0; i < 8; i++) {
-      if ( i<6 ){
-        dataFile.print(bat[i]);
+    ta = tp + ((millis() - ti) / 1000);
+    timeinfo = gmtime(&ta); // tiempo para guardar
+    File dataFile = SD.open("/datos.txt", FILE_WRITE);
+    if (dataFile) {
+        dataFile.seek(dataFile.size());
+        for (int i = 0; i < 8; i++) {
+        if ( i<6 ){
+            dataFile.print(bat[i]);
+            dataFile.print(",");
+        }else{
+            dataFile.print(lec[i]);
+            dataFile.print(",");
+        }
+        }
+        dataFile.print(timeinfo);
         dataFile.print(",");
-      }else{
-        dataFile.print(lec[i]);
-        dataFile.print(",");
-      }
+        dataFile.println(); 
+        dataFile.close();
+        //Serial.println("Data saved");
+    } else {
+        Serial.println("Error opening data file");
     }
-    
-    dataFile.println(); 
-    dataFile.close();
-    //Serial.println("Data saved");
-  } else {
-    Serial.println("Error opening data file");
-  }
 }
 
 void setup(void) {
@@ -553,6 +584,9 @@ void setup(void) {
     delay(2000);
     initsd();
     initpin();
+    ti = millis();
+    ta = 0;
+    tiempoin();
 
     mutex = xSemaphoreCreateMutex();
     // Crea las tareas en diferentes núcleos

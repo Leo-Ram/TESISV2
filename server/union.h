@@ -59,12 +59,13 @@ const String paginaHTML = R"====(<!DOCTYPE html>
             <div id="disp-box">
                 <input type="number" class="form-input input-conf" value="588">
                 <input type="number" class="form-input input-conf" value="272">
-                <input type="number" class="form-input input-conf" value="201">
-                <input type="number" class="form-input input-conf" value="144">
-                <input type="number" class="form-input input-conf" value="125">
-                <input type="number" class="form-input input-conf" value="102">
+                <input type="number" class="form-input input-conf" value="199.5">
+                <input type="number" class="form-input input-conf" value="143.6">
+                <input type="number" class="form-input input-conf" value="124">
+                <input type="number" class="form-input input-conf" value="101.7">
                 <input type="number" class="form-input input-conf" value="1">
                 <input type="number" class="form-input input-conf" value="1">
+                <input type="number" class="form-input input-conf" value="0">
                 <input type="number" class="form-input input-conf" value="0">
                 <input type="button" class="form-input" value="Guardar" id="volta">
             </div>      
