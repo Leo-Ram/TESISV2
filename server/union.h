@@ -63,7 +63,7 @@ const String paginaHTML = R"====(<!DOCTYPE html>
                 <input type="number" class="form-input input-conf" value="143.6">
                 <input type="number" class="form-input input-conf" value="124">
                 <input type="number" class="form-input input-conf" value="101.7">
-                <input type="number" class="form-input input-conf" value="1">
+                <input type="number" class="form-input input-conf" value="8">
                 <input type="number" class="form-input input-conf" value="1">
                 <input type="number" class="form-input input-conf" value="0">
                 <input type="number" class="form-input input-conf" value="0">

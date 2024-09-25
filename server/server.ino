@@ -258,7 +258,6 @@ void leer() {
         lec[i] = analogRead(ANG);
     }
     lec[6] = INA.getCurrent_mA();
-    lec[6] = lec[6] / 6.1;
     float temp = dht.readTemperature();
     if (!isnan(temp)) {
         lec[7] = temp;
@@ -363,14 +362,17 @@ void handleCharging(bool batteryStates[]) {
             if(!bancc){
                 cc = ajuste(cc,conf[5],true);
             }else{
-                analogWrite(OVP,255);
+                cc = 255;
+                analogWrite(OVP,cc);
             }
         }else{
-            analogWrite(OVP,255);
+            cc = 255;
+            analogWrite(OVP,cc);
             bancc = true;
         }
     }else{
-        analogWrite(OVP,255);
+        cc = 255;
+        analogWrite(OVP,cc);
     }
 }
 
@@ -382,14 +384,17 @@ void handleDischarging(bool batteryStates[]) {
             if(!bandd){
                 dd = ajuste(dd,conf[6],false);
             }else{
-                analogWrite(UVP,255);
+                dd = 255;
+                analogWrite(UVP,dd);
             }
         }else{
-            analogWrite(UVP,255);
+            dd = 255;
+            analogWrite(UVP,dd);
             bandd = true;
         }
     }else{
-        analogWrite(UVP,255);
+        dd = 255;
+        analogWrite(UVP,dd);
     }
 }
 
