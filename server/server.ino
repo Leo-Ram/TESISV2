@@ -44,7 +44,7 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t mutex;
 
-const int nConf = 9;    // numero de lectoruas configuracion en web
+const int nConf = 10;    // numero de lectoruas configuracion en web
 const int nAng = 5;     // numero de entradas analogas
 const int nSal = 10;     // numero de salidas
 const int nBot = 4;     // numero de botones web

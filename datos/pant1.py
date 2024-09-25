@@ -6,7 +6,7 @@ from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
 
-data = pd.read_json("datos/2024-09-05-data1.json")
+data = pd.read_json("datos/2024-09-24-data3.json")
 
 dataFlat = json_normalize(data['data']).reset_index()
 dataFlat.rename(columns={'index': 'id'}, inplace=True)

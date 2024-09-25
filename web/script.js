@@ -18,6 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const database = getDatabase(app); 
+let datap = [3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 21.1, 500, 50];
 
 medidas();
 configuracion();
@@ -62,8 +63,8 @@ function medidas() {
 }
 function configuracion() {
     const container2 = document.getElementById('container-form-id');
-    const configuraciones = ["OVP(V)", "OVPR(V)", "UVP(V)", "UVPR(V)", "VBalc(V)","CCP(A)", "DCP(A)", "Tmin(°C)", "Tmax(°C)"];
-    const prec = [4.2,4,3.2,3.4,2.5,1.5,2,4,60];
+    const configuraciones = ["OVP(V)", "OVPR(V)", "UVP(V)", "UVPR(V)", "VBalc(V)","CCP(mA)", "DCP(mA)", "Tmin(°C)", "Tmax(°C)","Cap(A/H)"];
+    const prec = [4.2,4,3.2,3.4,2.5,1000,1000,4,60,1.8];
     configuraciones.forEach(element => {
         const containerdiv = document.createElement('div');
         containerdiv.className = 'container-input';
@@ -85,48 +86,44 @@ function configuracion() {
     });
 }
 
-setInterval(getinfo,5000);
+let t = 5000;
+setInterval(getinfo,t);
 
 function getinfo() {
     let conf = document.getElementsByClassName('form-input');
     let c= [] ;
+    let soc = [];
     for (let i = 0; i < conf.length; i++) {
         c[i]= parseFloat(conf.item(i).value);        
     }
+    let med = c[0]-c[2];
     const lecturas = ['Bat1', 'Bat2', 'Bat3', 'Bat4', 'Bat5', 'Bat6', 'VT','Cbat', 'T°C'];
     let objetojs = {timestamp: new Date().toISOString(),};
     console.log(objetojs);
     fetch('/informacion')
     .then(response => response.text())
     .then(data => {
-        //data = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,1,50';
+        //data = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50';
         data = data.split(',');
         data = data.map(str => parseFloat(str));
         for (let i = 0; i < data.length; i++) {
             document.getElementById(`read${i}`).textContent = data[i];
             objetojs[lecturas[i]] = data[i];
         }
+        let socvt = 0;
         for (let i = 0; i < 6; i++) {
-            let d = data[i];
-            d = (((d-c[2])/(c[0]-c[2]))*100);
-            d = d.toFixed(0)
-            d += '%';
-            document.getElementById(`readP${i}`).textContent = d;
+            soc[i] = ((datap[i]-c[2])/med) + (((data[7]/1000)*(t/1000))/(c[9]*3600));
+            soc[i] = soc[i].toFixed(2);
+            soc[i] = soc[i] * 100
+            socvt += soc[i];
+            soc[i] = soc[i] + '%';
+            document.getElementById(`readP${i}`).textContent = soc[i];
         }
-        c[0] = c[0] * 6;
-        c[2] = c[2] * 6;
-        data[6] = (((data[6]-c[2])/(c[0]-c[2]))*100);
-        data[6] = data[6].toFixed(0);
-
-        data[7] = (data[7]/c[5])*100;
-        data[7] = data[7].toFixed(0);
-        data[8] = (((data[8]-c[7])/(c[8]-c[7]))*100);
-        data[8] = data[8].toFixed(0);
-        for (let i = 6; i < data.length; i++){
-            document.getElementById(`readP${i}`).textContent = data[i] + '%';
-        }
+        document.getElementById(`readP${6}`).textContent = (socvt/6) + '%';
+        document.getElementById(`readP${7}`).textContent = ((data[7]/c[5])*100).toFixed(0) + '%';
+        document.getElementById(`readP${8}`).textContent = (((data[8]-c[7])/(c[8]-c[7]))*100).toFixed(0) + '%';
+        datap = data;
         enviar('data',objetojs)
-
     })
 }
 
