@@ -6,7 +6,7 @@ from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
 
-data = pd.read_json("datos/2024-09-24-data3.json")
+data = pd.read_json("datos/2024-09-25-data4.json")
 
 dataFlat = json_normalize(data['data']).reset_index()
 dataFlat.rename(columns={'index': 'id'}, inplace=True)
@@ -37,7 +37,7 @@ cleaned_data.set_index('timestamp', inplace=True)
 fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(15, 15), sharex=True)
 
 # Lista de nombres de las columnas de las baterías
-bat_columns = ['Bat1', 'Bat2', 'Bat3', 'Bat4', 'Bat5', 'Bat6']
+bat_columns = ['B1(V)', 'B2(V)', 'B3(V)', 'B4(V)', 'B5(V)', 'B6(V)']
 
 std_devs = filtered_data[bat_columns].std()
 std_devs_max = std_devs.max()
@@ -50,7 +50,7 @@ for i, column in enumerate(bat_columns):
     ax = axes_flat[i]
     ax.plot(cleaned_data.index, cleaned_data[column], label=column)
     ax.set_ylabel(column + " [V]")
-    ax.set_ylim(0,4.4)
+    ax.set_ylim(2.5,4.4)
     ax.legend(loc='upper right')
     ax.grid(True)
     

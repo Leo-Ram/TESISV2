@@ -288,7 +288,7 @@ void control() {
         return;
     }else {
         bool batteryStates[5] = {true, true, true, true, true};
-        bool balanceStates[nBat] = {false};
+        bool balanceStates[nBat] = {false,false,false,false,false,false};
         updateBatteryStates(batteryStates, balanceStates);
 
         handleCharging(batteryStates);
@@ -399,7 +399,7 @@ void handleDischarging(bool batteryStates[]) {
 }
 
 void handleBalancing(bool balanceStates[], bool batteryStates[]) {
-    if (boton[2] && !batteryStates[4]) {
+    if (boton[2] && !batteryStates[4] && (lec[6]>300)) {
         digitalWrite(B1, balanceStates[0] ? HIGH : LOW);
         digitalWrite(B2, balanceStates[1] ? HIGH : LOW);
         digitalWrite(B3, balanceStates[2] ? HIGH : LOW);
@@ -565,8 +565,9 @@ void escribirsd(){
             dataFile.print(",");
         }
         }
-        dataFile.print(timeinfo);
+        dataFile.print(lec[5]);
         dataFile.print(",");
+        dataFile.print(timeinfo);
         dataFile.println(); 
         dataFile.close();
         //Serial.println("Data saved");

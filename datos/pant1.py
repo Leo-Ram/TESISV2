@@ -6,7 +6,7 @@ from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
 
-data = pd.read_json("datos/2024-09-24-data3.json")
+data = pd.read_json("datos/2024-09-25-data4.json")
 
 dataFlat = json_normalize(data['data']).reset_index()
 dataFlat.rename(columns={'index': 'id'}, inplace=True)
@@ -14,7 +14,7 @@ dataFlat['timestamp'] = pd.to_datetime(dataFlat['timestamp'])
 
 print("hola")
 print(dataFlat.head(10))
-nombre = "VT"
+nombre = "B2(V)"
 
 fig, ax1 = plt.subplots(figsize=(10,6))
 ax1.plot(dataFlat['timestamp'], dataFlat[nombre], marker='o', linestyle='-', color='b', label='Bat1')
