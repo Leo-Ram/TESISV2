@@ -356,11 +356,15 @@ int ajuste(int x,float cf,bool m){
 void handleCharging(bool batteryStates[]) {
     if(boton[0]){
         if(batteryStates[0] & batteryStates[1]){
-            cc = ajuste(cc,conf[5],true);
+            cc = 0;
+            analogWrite(OVP,cc);
+            //cc = ajuste(cc,conf[5],true);
             bancc = false;
         }else if(batteryStates[0] & !batteryStates[1]){
             if(!bancc){
-                cc = ajuste(cc,conf[5],true);
+                cc = 0;
+                analogWrite(OVP,cc);
+                //cc = ajuste(cc,conf[5],true);
             }else{
                 cc = 255;
                 analogWrite(OVP,cc);
@@ -380,6 +384,7 @@ void handleDischarging(bool batteryStates[]) {
     if(boton[1]){
         if(batteryStates[2] & batteryStates[3]){
             dd = ajuste(dd,conf[6],false);
+            bandd = false;
         }else if(batteryStates[2] & !batteryStates[3]){
             if(!bandd){
                 dd = ajuste(dd,conf[6],false);

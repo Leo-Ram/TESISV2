@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-09-26-sddata5p"
+direccion = "datossd/2024-09-28-sddata7p"
 
 df = pd.read_csv(direccion+".csv")
 
@@ -31,22 +31,25 @@ def plot_single_variable(df, variable, start_time, end_time):
 
     # Gráfico de la variable vs tiempo
     ax1.plot(df_filtered['TIME'], df_filtered[variable], color='blue')
-    ax1.set_ylabel(variable)
+    ax1.grid(True)
+    ax1.set_ylabel(variable+"[V]")
     ax1.set_title(f'{variable} vs Tiempo')
 
     # Gráfico de I vs tiempo
     ax2.plot(df_filtered['TIME'], df_filtered['I'], color='red')
-    ax2.set_ylabel('I')
+    ax2.grid(True)
+    ax2.set_ylabel('I[mA]')
     ax2.set_title('I vs Tiempo')
 
     # Gráfico de la potencia vs tiempo
     power_col = f'P{variable}'
     ax3.plot(df_filtered['TIME'], df_filtered[power_col], color='green')
-    ax3.set_ylabel(power_col)
+    ax3.grid(True)
+    ax3.set_ylabel(power_col+"[W]")
     ax3.set_title(f'{power_col} vs Tiempo')
 
     # Configurar el formato de tiempo para el eje x
-    ax3.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     ax3.xaxis.set_major_locator(mdates.AutoDateLocator())
     plt.setp(ax3.xaxis.get_majorticklabels(), rotation=45, ha='right')
     ax3.set_xlabel('Tiempo')
@@ -57,8 +60,8 @@ def plot_single_variable(df, variable, start_time, end_time):
 # Ejemplo de uso:
 # Asegúrate de que 'df' esté definido y cargado correctamente antes de llamar a esta función
 # limite   2024-01-01 00:06:54      2024-01-01 08:12:35    
-start_time = pd.to_datetime('2024-01-01 03:06:54')
-end_time = pd.to_datetime('2024-01-01 05:06:54')
-variable_to_plot = 'B1'  # Puedes cambiar esto a cualquier variable que desees graficar
+start_time = pd.to_datetime('2024-01-01 00:10:00')
+end_time = pd.to_datetime('2024-01-01 03:50:04')
+variable_to_plot = 'VT'  # Puedes cambiar esto a cualquier variable que desees graficar
 
 plot_single_variable(df, variable_to_plot, start_time, end_time)

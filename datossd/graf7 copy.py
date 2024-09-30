@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-09-26-sddata5p"
+direccion = "datossd/2024-09-28-sddata7p"
 
 df = pd.read_csv(direccion+".csv")
 
@@ -25,7 +25,7 @@ def plot_variables_and_power(df, start_time, end_time):
 
     # Configurar el gráfico
     fig, axs = plt.subplots(7, 3, figsize=(20, 30), sharex='col')
-    fig.suptitle('Variables, Corriente y Potencia vs Tiempo', fontsize=16)
+    fig.suptitle('Voltaje, Corriente y Potencia vs Tiempo', fontsize=16)
 
     variables = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'VT']
 
@@ -66,8 +66,8 @@ def plot_variables_and_power(df, start_time, end_time):
 
 
 # Definir el intervalo de tiempo (ajusta estos valores según tus necesidades)
-start_time = pd.to_datetime('2024-01-01 00:02:50')
-end_time = pd.to_datetime('2024-01-01 08:11:26')
+start_time = pd.to_datetime('2024-01-01 00:10:00')
+end_time = pd.to_datetime('2024-01-01 03:50:04')
 
 # Llamar a la función para crear los gráficos
 plot_variables_and_power(df, start_time, end_time)

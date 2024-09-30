@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-09-26-sddata5"
+direccion = "datossd/2024-09-28-sddata7"
 
 nameColumn = ["B1", "B2", "B3", "B4", "B5", "B6", "I","T","VT","TIME"]
 df = pd.read_csv(direccion+".txt",delimiter=',',names=nameColumn)
@@ -24,6 +24,9 @@ df['PVT'] = (df['VT'] * df['I'])/1000
 # Encontrar el índice donde ocurre el reinicio
 reset_index = df['TIME'].dt.time.argmin()
 
+
+print(reset_index)
+
 if reset_index > 0:
     # Calcular la diferencia de tiempo en el punto de reinicio
     time_difference = df['TIME'].iloc[reset_index - 1] - df['TIME'].iloc[reset_index]
@@ -38,7 +41,7 @@ if reset_index > 0:
 # para guardar la data procesada
 
 
-print(df.head(10))
+#print(df.head(10))
 
 output_filename = direccion+"p"+".csv"
 df.to_csv(output_filename, index=False)
