@@ -298,7 +298,7 @@ nav {
     margin-top: 15px;
     padding: 10px 20px;
     background: var(--secondary-color);
-    color: white;
+    color: var(--text-color-h);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -316,7 +316,7 @@ nav {
 
 .collapsible {
     background-color: var(--secondary-color);
-    color: white;
+    color: var(--text-color-h);
     cursor: pointer;
     padding: 18px;
     width: 100%;
@@ -333,7 +333,7 @@ nav {
 
 .collapsible:after {
     content: '\002B';
-    color: white;
+    color: var(--text-color-h);
     font-weight: bold;
     float: right;
     margin-left: 5px;
