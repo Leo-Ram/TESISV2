@@ -1,0 +1,363 @@
+:root {
+    /* Modo claro */
+    --primary-color: #1a237e;
+    --secondary-color: #3949ab;
+    --background-color: #f0f2f5;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --text-color-h: #efefef;
+    --button-off-bg: #e0e0e0;
+    --button-off-color: #757575;
+    --button-on-bg: #4caf50;
+    --button-on-color: white;
+}
+
+[data-theme="dark"] {
+    --primary-color: #000051;
+    --secondary-color: #1a237e;
+    --background-color: #121212;
+    --card-background: #1e1e1e;
+    --text-color: #ccc;
+    --text-color-h: #ddd;
+    --button-off-bg: #424242;
+    --button-off-color: #bdbdbd;
+    --button-on-bg: #1b5e20;
+    --button-on-color: white;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: var(--background-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background: var(--primary-color);
+    color: var(--text-color-h);
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.nav-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: var(--secondary-color);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 5px;
+}
+
+.controls {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.control-button {
+    padding: 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.control-button.off {
+    background: var(--button-off-bg);
+    color: var(--button-off-color);
+}
+
+.control-button.on {
+    background: var(--button-on-bg);
+    color: var(--button-on-color);
+}
+
+.control-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.2);
+}
+
+.monitoring-panel {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--card-background);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.battery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.battery-cell {
+    text-align: center;
+    padding: 10px;
+    background: var(--background-color);
+    border-radius: 5px;
+}
+
+.battery-cell p {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.battery-cell span {
+    font-size: 18px;
+}
+
+.total-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+.total-value {
+    background: var(--background-color);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-value p {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.total-value span {
+    font-size: 24px;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav {
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .controls {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+/* porcentajes */
+
+.battery-cell, .total-value {
+    position: relative;
+}
+
+.percentage-bar {
+    width: 100%;
+    height: 4px;
+    background-color: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.percentage-bar.large {
+    height: 6px;
+    margin-top: 10px;
+}
+
+.percentage-fill {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s ease;
+}
+
+.percentage-text {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-left: 5px;
+}
+
+/* Colores para diferentes niveles de porcentaje */
+.percentage-fill.high { background-color: #4caf50; }
+.percentage-fill.medium { background-color: #ffc107; }
+.percentage-fill.low { background-color: #f44336; }
+
+/* coniguraciones seccion*/
+
+/* Estilos para la sección de configuraciones */
+.slider-container {
+    margin-bottom: 20px;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    background: var(--button-off-bg);
+    border-radius: 4px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input {
+    padding: 8px;
+    border: 1px solid var(--button-off-bg);
+    border-radius: 4px;
+    background: var(--card-background);
+    color: var(--text-color);
+}
+
+.config-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.config-button:hover {
+    opacity: 0.9;
+}
+
+/* Estilos para secciones desplegables */
+.collapsible-section {
+    margin-top: 20px;
+}
+
+.collapsible {
+    background-color: var(--secondary-color);
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    transition: 0.3s;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapsible:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+    transition: 0.3s;
+}
+
+.collapsible.active:after {
+    content: "\2212";
+    transform: rotate(180deg);
+}
+
+.collapsible:hover {
+    background-color: var(--primary-color);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: var(--card-background);
+}
+
+.collapsible-content .card {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDENAR BMS-Local</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">UDENAR BMS-Local</div>
+            <nav>
+                <button class="nav-button">Lecturas</button>
+                <button class="nav-button">Configuración</button>
+                <button class="nav-button">Guía</button>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="controls">
+            <button class="control-button off" data-function="carga">Carga</button>
+            <button class="control-button off" data-function="descarga">Descarga</button>
+            <button class="control-button off" data-function="balance">Balance</button>
+            <button class="control-button off" data-function="emergencia">Emergencia</button>
+        </div>
+        <div class="monitoring-panel">
+            <div class="card">
+                <h2>Voltajes de Baterías</h2>
+                <div class="battery-grid">
+                    <div class="battery-cell">
+                        <p>Batería 1</p>
+                        <span id="bat1">--</span>V
+                        <span class="percentage-text" id="socText1">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc1"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 2</p>
+                        <span id="bat2">--</span>V
+                        <span class="percentage-text" id="socText2">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc2"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 3</p>
+                        <span id="bat3">--</span>V
+                        <span class="percentage-text" id="socText3">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc3"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 4</p>
+                        <span id="bat4">--</span>V
+                        <span class="percentage-text" id="socText4">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc4"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 5</p>
+                        <span id="bat5">--</span>V
+                        <span class="percentage-text" id="socText5">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc5"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 6</p>
+                        <span id="bat6">--</span>V
+                        <span class="percentage-text" id="socText6">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Valores Totales</h2>
+                <div class="total-values">
+                    <div class="total-value">
+                        <p>Voltaje Total</p>
+                        <span id="Total">--</span>V
+                        <span class="percentage-text" id="socTextTotal">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socTotal"></div>
+                        </div>
+                    </div>
+                    <div class="total-value">
+                        <p>Corriente</p>
+                        <span id="Current">--</span>A
+                        <span class="percentage-text" id="socTextCurrent">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socCurrent"></div>
+                        </div>
+                    </div>
+                    <div class="total-value">
+                        <p>Temperatura</p>
+                        <span id="Temperature">--</span>°C
+                        <span class="percentage-text" id="socTextTemperature">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socTemperature"></div>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--config-->
+        <div class="config-panel" id="configPanel" style="display: none;">
+            <!-- Configuración Básica siempre visible -->
+            <div class="card">
+                <h2>Configuración Básica</h2>
+                <div class="slider-container">
+                    <label for="voltageSlider">Uso de Voltaje (%)</label>
+                    <input type="range" id="voltageSlider" min="0" max="100" value="50" class="slider">
+                    <span id="voltageValue">50%</span>
+                </div>
+                <div class="slider-container">
+                    <label for="currentSlider">Uso de Corriente (%)</label>
+                    <input type="range" id="currentSlider" min="0" max="100" value="50" class="slider">
+                    <span id="currentValue">50%</span>
+                </div>
+                <button class="config-button">Enviar</button>
+            </div>
+        
+            <!-- Secciones desplegables -->
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones de Protección</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="OVP">OVP (V)</label>
+                                <input type="number" id="OVP" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="OVPR">OVPR (V)</label>
+                                <input type="number" id="OVPR" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="UVP">UVP (V)</label>
+                                <input type="number" id="UVP" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="UVPR">UVPR (V)</label>
+                                <input type="number" id="UVPR" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="VBalc">VBalc (V)</label>
+                                <input type="number" id="VBalc" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="CCP">CCP (mA)</label>
+                                <input type="number" id="CCP">
+                            </div>
+                            <div class="input-group">
+                                <label for="DCP">DCP (mA)</label>
+                                <input type="number" id="DCP">
+                            </div>
+                            <div class="input-group">
+                                <label for="Tmin">Tmin (°C)</label>
+                                <input type="number" id="Tmin">
+                            </div>
+                            <div class="input-group">
+                                <label for="Tmax">Tmax (°C)</label>
+                                <input type="number" id="Tmax">
+                            </div>
+                            <div class="input-group">
+                                <label for="Cap">Cap (A/H)</label>
+                                <input type="number" id="Cap" step="0.1">
+                            </div>
+                            <!-- ... resto de los inputs ... -->
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones Absolutas</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="abs1">VMax(V)</label>
+                                <input type="number" id="abs1" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="abs2">VMin(V)</label>
+                                <input type="number" id="abs2" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="abs3">Imax(mA)</label>
+                                <input type="number" id="abs3">
+                            </div>
+                            <div class="input-group">
+                                <label for="abs4">Cap(A/H)</label>
+                                <input type="number" id="abs4" step="0.1">
+                            </div>
+                            <!-- ... resto de los inputs ... -->
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones de Administrador</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="admin1">Config Admin 1</label>
+                                <input type="number" id="admin1">
+                            </div>
+                            <!-- ... resto de los inputs ... -->
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="script.js">
+    </script>
+</body>
+</html>
