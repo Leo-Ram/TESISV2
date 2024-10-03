@@ -1,6 +1,7 @@
 #include <WiFi.h>        //red wifi
 #include <esp_wifi.h>
 #include <WebServer.h>   // web comunicacion
+#include <ArduinoJson.h>  // para archivos json
 #include <ESPmDNS.h>     // no escribir ip 
 #include <Preferences.h> //guardad coniguracion
 #include "config.h"      // credenciales wifi
@@ -44,6 +45,47 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t mutex;
 
+
+
+void configuracion(){
+    digitalWrite(LED,1);
+    String json = server.arg("plain");
+    Serial.println(json);
+
+    // Crear un documento JSON
+    StaticJsonDocument<1024> doc;
+
+    DeserializationError error = deserializeJson(doc, json);
+    //Serial.println(doc);
+    if (error) {
+        Serial.print("Error al parsear JSON: ");
+        server.send(400, "text/plain", "Error en el formato JSON");
+    } else {
+        
+        JsonObject obj = doc.as<JsonObject>();
+        for (JsonPair p : obj) {
+            const char* key = p.key().c_str();
+            JsonVariant value = p.value();
+            
+            Serial.print("Clave: ");
+            Serial.print(key);
+            Serial.print(" - Valor: ");
+            
+            // Manejar diferentes tipos de valores
+            if (value.is<int>()) {
+                Serial.println(value.as<int>());
+            } else if (value.is<float>()) {
+                Serial.println(value.as<float>());
+            } else if (value.is<const char*>()) {
+                Serial.println(value.as<const char*>());
+            }
+        }
+        // Procesar todas las variables mapeadas
+    }
+    server.send(200,"text/plain","todo correcto");
+    digitalWrite(LED,0);
+}
+
 void handleNotFound() {
     digitalWrite(LED,1);
     String message = "File Not Found\n\n";
@@ -63,6 +105,7 @@ void handleNotFound() {
     digitalWrite(LED,0);
 }
 
+
 void setupServer() {
     server.on("/", [](){
     server.send(200, "text/html", paginaHTML);
@@ -73,6 +116,13 @@ void setupServer() {
     server.on("/script.javascript",[](){
         server.send(200, "text/javascript", paginaJS);
     });
+    //no base
+    server.on("/conf", HTTP_POST, []() {
+        configuracion();
+    });
+    server.onNotFound(handleNotFound);
+    server.begin();
+    Serial.println("HTTP server started");
 }
 
 void Task1code(void * pvParameters) {

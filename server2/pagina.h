@@ -2,440 +2,448 @@
 #define PAGINA_H
 
 const String paginaHTML = R"====(<!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>UDENAR BMS-Local</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <header>
-            <div class="container header-content">
-                <div class="logo">UDENAR BMS-Local</div>
-                <nav>
-                    <button class="nav-button">Lecturas</button>
-                    <button class="nav-button">Configuración</button>
-                    <button class="nav-button">Guía</button>
-                    <button class="theme-toggle" id="themeToggle">🌓</button>
-                </nav>
-            </div>
-        </header>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDENAR BMS-Local</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">UDENAR BMS-Local</div>
+            <nav>
+                <button class="nav-button">Lecturas</button>
+                <button class="nav-button">Configuración</button>
+                <button class="nav-button">Guía</button>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </nav>
+        </div>
+    </header>
 
-        <main class="container">
-            <div class="controls">
-                <button class="control-button off" data-function="carga">Carga</button>
-                <button class="control-button off" data-function="descarga">Descarga</button>
-                <button class="control-button off" data-function="balance">Balance</button>
-                <button class="control-button off" data-function="emergencia">Emergencia</button>
-            </div>
-            <div class="monitoring-panel">
-                <div class="card">
-                    <h2>Voltajes de Baterías</h2>
-                    <div class="battery-grid">
-                        <div class="battery-cell">
-                            <p>Batería 1</p>
-                            <span id="bat1">--</span>V
-                            <span class="percentage-text" id="socText1">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc1"></div>
-                            </div>
-                        </div>
-                        <div class="battery-cell">
-                            <p>Batería 2</p>
-                            <span id="bat2">--</span>V
-                            <span class="percentage-text" id="socText2">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc2"></div>
-                            </div>
-                        </div>
-                        <div class="battery-cell">
-                            <p>Batería 3</p>
-                            <span id="bat3">--</span>V
-                            <span class="percentage-text" id="socText3">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc3"></div>
-                            </div>
-                        </div>
-                        <div class="battery-cell">
-                            <p>Batería 4</p>
-                            <span id="bat4">--</span>V
-                            <span class="percentage-text" id="socText4">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc4"></div>
-                            </div>
-                        </div>
-                        <div class="battery-cell">
-                            <p>Batería 5</p>
-                            <span id="bat5">--</span>V
-                            <span class="percentage-text" id="socText5">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc5"></div>
-                            </div>
-                        </div>
-                        <div class="battery-cell">
-                            <p>Batería 6</p>
-                            <span id="bat6">--</span>V
-                            <span class="percentage-text" id="socText6">--%</span>
-                            <div class="percentage-bar">
-                                <div class="percentage-fill" id="soc6"></div>
-                            </div>
+    <main class="container">
+        <div class="controls">
+            <button class="control-button off" data-function="carga">Carga</button>
+            <button class="control-button off" data-function="descarga">Descarga</button>
+            <button class="control-button off" data-function="balance">Balance</button>
+            <button class="control-button off" data-function="emergencia">Emergencia</button>
+        </div>
+        <div class="monitoring-panel">
+            <div class="card">
+                <h2>Voltajes de Baterías</h2>
+                <div class="battery-grid">
+                    <div class="battery-cell">
+                        <p>Batería 1</p>
+                        <span id="bat1">--</span>V
+                        <span class="percentage-text" id="socText1">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc1"></div>
                         </div>
                     </div>
-                </div>
-                <div class="card">
-                    <h2>Valores Totales</h2>
-                    <div class="total-values">
-                        <div class="total-value">
-                            <p>Voltaje Total</p>
-                            <span id="Total">--</span>V
-                            <span class="percentage-text" id="socTextTotal">--%</span>
-                            <div class="percentage-bar large">
-                                <div class="percentage-fill" id="socTotal"></div>
-                            </div>
+                    <div class="battery-cell">
+                        <p>Batería 2</p>
+                        <span id="bat2">--</span>V
+                        <span class="percentage-text" id="socText2">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc2"></div>
                         </div>
-                        <div class="total-value">
-                            <p>Corriente</p>
-                            <span id="Current">--</span>A
-                            <span class="percentage-text" id="socTextCurrent">--%</span>
-                            <div class="percentage-bar large">
-                                <div class="percentage-fill" id="socCurrent"></div>
-                            </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 3</p>
+                        <span id="bat3">--</span>V
+                        <span class="percentage-text" id="socText3">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc3"></div>
                         </div>
-                        <div class="total-value">
-                            <p>Temperatura</p>
-                            <span id="Temperature">--</span>°C
-                            <span class="percentage-text" id="socTextTemperature">--%</span>
-                            <div class="percentage-bar large">
-                                <div class="percentage-fill" id="socTemperature"></div>
-                            </div>    
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 4</p>
+                        <span id="bat4">--</span>V
+                        <span class="percentage-text" id="socText4">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc4"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 5</p>
+                        <span id="bat5">--</span>V
+                        <span class="percentage-text" id="socText5">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc5"></div>
+                        </div>
+                    </div>
+                    <div class="battery-cell">
+                        <p>Batería 6</p>
+                        <span id="bat6">--</span>V
+                        <span class="percentage-text" id="socText6">--%</span>
+                        <div class="percentage-bar">
+                            <div class="percentage-fill" id="soc6"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!--config-->
-            <div class="config-panel" id="configPanel" style="display: none;">
-                <!-- Configuración Básica siempre visible -->
-                <div class="card">
-                    <h2>Configuración Básica</h2>
-                    <div class="slider-container">
-                        <label for="voltageSlider">Uso de Voltaje (%)</label>
-                        <input type="range" id="voltageSlider" min="0" max="100" value="50" class="slider">
-                        <span id="voltageValue">50%</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="currentSlider">Uso de Corriente (%)</label>
-                        <input type="range" id="currentSlider" min="0" max="100" value="50" class="slider">
-                        <span id="currentValue">50%</span>
-                    </div>
-                    <button class="config-button">Enviar</button>
-                </div>
-            
-                <!-- Secciones desplegables -->
-                <div class="collapsible-section">
-                    <button class="collapsible">Configuraciones de Protección</button>
-                    <div class="collapsible-content">
-                        <div class="card">
-                            <div class="input-grid">
-                                <div class="input-group">
-                                    <label for="OVP">OVP (V)</label>
-                                    <input type="number" id="OVP" step="0.1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="OVPR">OVPR (V)</label>
-                                    <input type="number" id="OVPR" step="0.1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="UVP">UVP (V)</label>
-                                    <input type="number" id="UVP" step="0.1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="UVPR">UVPR (V)</label>
-                                    <input type="number" id="UVPR" step="0.1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="VBalc">VBalc (V)</label>
-                                    <input type="number" id="VBalc" step="0.1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="CCP">CCP (mA)</label>
-                                    <input type="number" id="CCP">
-                                </div>
-                                <div class="input-group">
-                                    <label for="DCP">DCP (mA)</label>
-                                    <input type="number" id="DCP">
-                                </div>
-                                <div class="input-group">
-                                    <label for="Tmin">Tmin (°C)</label>
-                                    <input type="number" id="Tmin">
-                                </div>
-                                <div class="input-group">
-                                    <label for="Tmax">Tmax (°C)</label>
-                                    <input type="number" id="Tmax">
-                                </div>
-                                <div class="input-group">
-                                    <label for="Cap">Cap (A/H)</label>
-                                    <input type="number" id="Cap" step="0.1">
-                                </div>
-                            </div>
-                            <button class="config-button">Enviar</button>
+            <div class="card">
+                <h2>Valores Totales</h2>
+                <div class="total-values">
+                    <div class="total-value">
+                        <p>Voltaje Total</p>
+                        <span id="Total">--</span>V
+                        <span class="percentage-text" id="socTextTotal">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socTotal"></div>
                         </div>
                     </div>
-                </div>
-            
-                <div class="collapsible-section">
-                    <button class="collapsible">Configuraciones Absolutas</button>
-                    <div class="collapsible-content">
-                        <div class="card">
-                            <div class="input-grid">
-                                <div class="input-group">
-                                    <label for="VMax">VMax(V)</label>
-                                    <input type="number" id="VMax" step="0.1" value="4.2">
-                                </div>
-                                <div class="input-group">
-                                    <label for="VMin">VMin(V)</label>
-                                    <input type="number" id="VMin" step="0.1" value="2.8">
-                                </div>
-                                <div class="input-group">
-                                    <label for="IMax">Imax(mA)</label>
-                                    <input type="number" id="IMax" value="1500">
-                                </div>
-                                <div class="input-group">
-                                    <label for="Cap">Cap(A/H)</label>
-                                    <input type="number" id="Cap" step="0.1" value="1.8">
-                                </div>
-                                <!-- ... resto de los inputs ... -->
-                            </div>
-                            <button class="config-button">Enviar</button>
+                    <div class="total-value">
+                        <p>Corriente</p>
+                        <span id="Current">--</span>A
+                        <span class="percentage-text" id="socTextCurrent">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socCurrent"></div>
                         </div>
                     </div>
-                </div>
-            
-                <div class="collapsible-section">
-                    <button class="collapsible">Configuraciones de Administrador</button>
-                    <div class="collapsible-content">
-                        <div class="card">
-                            <div class="input-grid">
-                                <div class="input-group">
-                                    <label for="GB1">GB1</label>
-                                    <input type="number" id="GB1" value="588">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GB2">GB2</label>
-                                    <input type="number" id="GB2" value="272">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GB3">GB3</label>
-                                    <input type="number" id="GB3" value="199.5">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GB4">GB4</label>
-                                    <input type="number" id="GB4" value="143.6">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GB5">GB5</label>
-                                    <input type="number" id="GB5" value="124.5">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GB6">GB6</label>
-                                    <input type="number" id="GB6" value="102.2">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GBI">GI</label>
-                                    <input type="number" id="GBI" value="4.8">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GT">GT</label>
-                                    <input type="number" id="GT" value="1">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GANG">ANG</label>
-                                    <input type="number" id="GANG" value="0">
-                                </div>
-                                <div class="input-group">
-                                    <label for="GS">Server off</label>
-                                    <input type="number" id="GS" value="0">
-                                </div>
-                                <!-- ... resto de los inputs ... -->
-                            </div>
-                            <button class="config-button">Enviar</button>
-                        </div>
+                    <div class="total-value">
+                        <p>Temperatura</p>
+                        <span id="Temperature">--</span>°C
+                        <span class="percentage-text" id="socTextTemperature">--%</span>
+                        <div class="percentage-bar large">
+                            <div class="percentage-fill" id="socTemperature"></div>
+                        </div>    
                     </div>
                 </div>
             </div>
-        </main>
-        <script type="module" src="script.js">
-        </script>
-    </body>
-    </html>)====";
-const String paginaJS = R"====(// Modo oscuro
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', function() {
-        const html = document.documentElement;
-        if (html.getAttribute('data-theme') === 'light') {
-            html.setAttribute('data-theme', 'dark');
-        } else {
-            html.setAttribute('data-theme', 'light');
+        </div>
+        <!--config-->
+        <div class="config-panel" id="configPanel" style="display: none;">
+            <!-- Configuración Básica siempre visible -->
+            <div class="card">
+                <h2>Configuración Básica</h2>
+                <div class="slider-container">
+                    <label for="voltageSlider">Uso de Voltaje (%)</label>
+                    <input type="range" id="voltageSlider" min="0" max="100" value="50" class="slider">
+                    <span id="voltageValue">50%</span>
+                </div>
+                <div class="slider-container">
+                    <label for="currentSlider">Uso de Corriente (%)</label>
+                    <input type="range" id="currentSlider" min="0" max="100" value="50" class="slider">
+                    <span id="currentValue">50%</span>
+                </div>
+                <button class="config-button">Enviar</button>
+            </div>
+        
+            <!-- Secciones desplegables -->
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones de Protección</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="OVP">OVP (V)</label>
+                                <input type="number" id="OVP" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="OVPR">OVPR (V)</label>
+                                <input type="number" id="OVPR" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="UVP">UVP (V)</label>
+                                <input type="number" id="UVP" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="UVPR">UVPR (V)</label>
+                                <input type="number" id="UVPR" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="VBalc">VBalc (V)</label>
+                                <input type="number" id="VBalc" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="CCP">CCP (mA)</label>
+                                <input type="number" id="CCP">
+                            </div>
+                            <div class="input-group">
+                                <label for="DCP">DCP (mA)</label>
+                                <input type="number" id="DCP">
+                            </div>
+                            <div class="input-group">
+                                <label for="Tmin">Tmin (°C)</label>
+                                <input type="number" id="Tmin">
+                            </div>
+                            <div class="input-group">
+                                <label for="Tmax">Tmax (°C)</label>
+                                <input type="number" id="Tmax">
+                            </div>
+                            <div class="input-group">
+                                <label for="Cap">Cap (A/H)</label>
+                                <input type="number" id="Cap" step="0.1">
+                            </div>
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones Absolutas</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="VMax">VMax(V)</label>
+                                <input type="number" id="VMax" step="0.1" value="4.2">
+                            </div>
+                            <div class="input-group">
+                                <label for="VMin">VMin(V)</label>
+                                <input type="number" id="VMin" step="0.1" value="2.8">
+                            </div>
+                            <div class="input-group">
+                                <label for="IMax">Imax(mA)</label>
+                                <input type="number" id="IMax" value="1500">
+                            </div>
+                            <div class="input-group">
+                                <label for="Cap">Cap(A/H)</label>
+                                <input type="number" id="Cap" step="0.1" value="1.8">
+                            </div>
+                            <!-- ... resto de los inputs ... -->
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="collapsible-section">
+                <button class="collapsible">Configuraciones de Administrador</button>
+                <div class="collapsible-content">
+                    <div class="card">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label for="GB1">GB1</label>
+                                <input type="number" id="GB1" value="588">
+                            </div>
+                            <div class="input-group">
+                                <label for="GB2">GB2</label>
+                                <input type="number" id="GB2" value="272">
+                            </div>
+                            <div class="input-group">
+                                <label for="GB3">GB3</label>
+                                <input type="number" id="GB3" value="199.5">
+                            </div>
+                            <div class="input-group">
+                                <label for="GB4">GB4</label>
+                                <input type="number" id="GB4" value="143.6">
+                            </div>
+                            <div class="input-group">
+                                <label for="GB5">GB5</label>
+                                <input type="number" id="GB5" value="124.5">
+                            </div>
+                            <div class="input-group">
+                                <label for="GB6">GB6</label>
+                                <input type="number" id="GB6" value="102.2">
+                            </div>
+                            <div class="input-group">
+                                <label for="GBI">GI</label>
+                                <input type="number" id="GBI" value="4.8">
+                            </div>
+                            <div class="input-group">
+                                <label for="GT">GT</label>
+                                <input type="number" id="GT" value="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="GANG">ANG</label>
+                                <input type="number" id="GANG" value="0">
+                            </div>
+                            <div class="input-group">
+                                <label for="GS">Server off</label>
+                                <input type="number" id="GS" value="0">
+                            </div>
+                            <!-- ... resto de los inputs ... -->
+                        </div>
+                        <button class="config-button">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="module" src="script.javascript">
+    </script>
+</body>
+</html>)====";
+const String paginaJS = R"====(
+// Modo oscuro
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', function() {
+    const html = document.documentElement;
+    if (html.getAttribute('data-theme') === 'light') {
+        html.setAttribute('data-theme', 'dark');
+    } else {
+        html.setAttribute('data-theme', 'light');
+    }
+});
+
+// Control buttons
+document.querySelectorAll('.control-button').forEach(button => {
+    button.addEventListener('click', function() {
+        this.classList.toggle('on');
+        this.classList.toggle('off');
+        
+        const function_name = this.getAttribute('data-function');
+        const state = this.classList.contains('on') ? 'true' : 'false';
+        let configData = {};
+        configData[function_name] = state;
+
+        fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
+
+        console.log(`${function_name} ${state}`);
+    });
+});
+
+// Simulación de recepción de datos
+function updateValues(data, soc) {
+    const values = data.split(',').map(Number);
+    const socValues = soc.split(',').map(Number);
+    
+    // Actualizar voltajes y SOC de baterías
+    for (let i = 1; i <= 6; i++) {
+        const batteryValue = values[i-1].toFixed(1);
+        const socValue = socValues[i-1];
+        
+        document.getElementById(`bat${i}`).textContent = batteryValue;
+        document.getElementById(`soc${i}`).style.width = `${socValue}%`;
+        document.getElementById(`socText${i}`).textContent = `${socValue}%`;
+
+
+        
+        // Actualizar color basado en el porcentaje
+        const socFill = document.getElementById(`soc${i}`);
+        socFill.className = 'percentage-fill ' + getColorClass(socValue);
+    }
+    // Actualizar valores totales y sus SOC
+    const totalElements = [
+        {value: values[6].toFixed(0), soc: socValues[6], id: 'Total'},
+        {value: values[7].toFixed(0), soc: socValues[7], id: 'Current'},
+        {value: values[8].toFixed(0), soc: socValues[8], id: 'Temperature'}
+    ];
+    
+    totalElements.forEach(elem => {
+        document.getElementById(`${elem.id}`).textContent = elem.value;
+        document.getElementById(`soc${elem.id}`).style.width = `${elem.soc}%`;
+        document.getElementById(`socText${elem.id}`).textContent = `${elem.soc}%`;
+        
+        const socFill = document.getElementById(`soc${elem.id}`);    
+        if (elem.id == "Total") {
+            socFill.className = 'percentage-fill ' + getColorClass(elem.soc);
+        }else{
+            socFill.className = 'percentage-fill ' + getColorClass((Math.abs(elem.soc-100)));
         }
     });
+}
 
-    // Control buttons
-    document.querySelectorAll('.control-button').forEach(button => {
+function getColorClass(percentage) {
+    if (percentage > 70) return 'high';
+    if (percentage > 30) return 'medium';
+    return 'low';
+}
+
+// Simular obtención de datos cada 5 segundos
+setInterval(() => {
+    const mockData = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50';
+    const mockSOC = '90,85,80,75,70,65,80,60,20';
+    updateValues(mockData, mockSOC);
+}, 5000);
+
+// Actualización inicial
+updateValues('3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50', '90,85,80,75,70,65,80,60,45');
+
+// configurationes seccion
+
+// Función para manejar los sliders
+function initializeSliders() {
+    const voltageSlider = document.getElementById('voltageSlider');
+    const currentSlider = document.getElementById('currentSlider');
+    const voltageValue = document.getElementById('voltageValue');
+    const currentValue = document.getElementById('currentValue');
+
+    function updateSliderValue(slider, valueDisplay) {
+        valueDisplay.textContent = slider.value + '%';
+    }
+
+    voltageSlider.addEventListener('input', () => updateSliderValue(voltageSlider, voltageValue));
+    currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue));
+}
+
+// Función para manejar la navegación entre secciones
+function initializeNavigation() {
+    const navButtons = document.querySelectorAll('.nav-button');
+    const configPanel = document.getElementById('configPanel');
+    const monitoringPanel = document.querySelector('.monitoring-panel');
+
+    navButtons.forEach(button => {
         button.addEventListener('click', function() {
-            this.classList.toggle('on');
-            this.classList.toggle('off');
-            
-            const function_name = this.getAttribute('data-function');
-            const state = this.classList.contains('on') ? 'activada' : 'desactivada';
-            console.log(`Función ${function_name} ${state}`);
-        });
-    });
-
-    // Simulación de recepción de datos
-    function updateValues(data, soc) {
-        const values = data.split(',').map(Number);
-        const socValues = soc.split(',').map(Number);
-        
-        // Actualizar voltajes y SOC de baterías
-        for (let i = 1; i <= 6; i++) {
-            const batteryValue = values[i-1].toFixed(1);
-            const socValue = socValues[i-1];
-            
-            document.getElementById(`bat${i}`).textContent = batteryValue;
-            document.getElementById(`soc${i}`).style.width = `${socValue}%`;
-            document.getElementById(`socText${i}`).textContent = `${socValue}%`;
-
-
-            
-            // Actualizar color basado en el porcentaje
-            const socFill = document.getElementById(`soc${i}`);
-            socFill.className = 'percentage-fill ' + getColorClass(socValue);
-        }
-        // Actualizar valores totales y sus SOC
-        const totalElements = [
-            {value: values[6].toFixed(0), soc: socValues[6], id: 'Total'},
-            {value: values[7].toFixed(0), soc: socValues[7], id: 'Current'},
-            {value: values[8].toFixed(0), soc: socValues[8], id: 'Temperature'}
-        ];
-        
-        totalElements.forEach(elem => {
-            document.getElementById(`${elem.id}`).textContent = elem.value;
-            document.getElementById(`soc${elem.id}`).style.width = `${elem.soc}%`;
-            document.getElementById(`socText${elem.id}`).textContent = `${elem.soc}%`;
-            
-            const socFill = document.getElementById(`soc${elem.id}`);    
-            if (elem.id == "Total") {
-                socFill.className = 'percentage-fill ' + getColorClass(elem.soc);
-            }else{
-                socFill.className = 'percentage-fill ' + getColorClass((Math.abs(elem.soc-100)));
+            if (this.textContent === 'Configuración') {
+                configPanel.style.display = 'block';
+                monitoringPanel.style.display = 'none';
+            } else if (this.textContent === 'Lecturas') {
+                configPanel.style.display = 'none';
+                monitoringPanel.style.display = 'grid';
             }
         });
-    }
+    });
+}
 
-    function getColorClass(percentage) {
-        if (percentage > 70) return 'high';
-        if (percentage > 30) return 'medium';
-        return 'low';
-    }
+// Función para manejar el envío de configuraciones
+function initializeConfigButtons() {
+    const configButtons = document.querySelectorAll('.config-button');
+    
+    configButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const card = this.closest('.card');
+            const inputs = card.querySelectorAll('input');
+            let configData = {};
+            
+            inputs.forEach(input => {
+                configData[input.id] = input.value;
+            });
+            
+            console.log('Enviando configuración:', configData);
+            // Aquí irá la lógica para enviar los datos al servidor
+            fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
+        });
+    });
+}
 
-    // Simular obtención de datos cada 5 segundos
-    setInterval(() => {
-        const mockData = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50';
-        const mockSOC = '90,85,80,75,70,65,80,60,20';
-        updateValues(mockData, mockSOC);
-    }, 5000);
-
-    // Actualización inicial
-    updateValues('3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50', '90,85,80,75,70,65,80,60,45');
-
-    // configurationes seccion
-
-    // Función para manejar los sliders
-    function initializeSliders() {
-        const voltageSlider = document.getElementById('voltageSlider');
-        const currentSlider = document.getElementById('currentSlider');
-        const voltageValue = document.getElementById('voltageValue');
-        const currentValue = document.getElementById('currentValue');
-
-        function updateSliderValue(slider, valueDisplay) {
-            valueDisplay.textContent = slider.value + '%';
-        }
-
-        voltageSlider.addEventListener('input', () => updateSliderValue(voltageSlider, voltageValue));
-        currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue));
-    }
-
-    // Función para manejar la navegación entre secciones
-    function initializeNavigation() {
-        const navButtons = document.querySelectorAll('.nav-button');
-        const configPanel = document.getElementById('configPanel');
-        const monitoringPanel = document.querySelector('.monitoring-panel');
-
-        navButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                if (this.textContent === 'Configuración') {
-                    configPanel.style.display = 'block';
-                    monitoringPanel.style.display = 'none';
-                } else if (this.textContent === 'Lecturas') {
-                    configPanel.style.display = 'none';
-                    monitoringPanel.style.display = 'grid';
+function initializeCollapsibles() {
+    const collapsibles = document.querySelectorAll('.collapsible');
+    
+    collapsibles.forEach(button => {
+        button.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+            
+            // Cerrar otras secciones
+            collapsibles.forEach(otherButton => {
+                if (otherButton !== this) {
+                    otherButton.classList.remove('active');
+                    otherButton.nextElementSibling.style.maxHeight = null;
                 }
             });
         });
-    }
+    });
+}
 
-    // Función para manejar el envío de configuraciones
-    function initializeConfigButtons() {
-        const configButtons = document.querySelectorAll('.config-button');
-        
-        configButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const card = this.closest('.card');
-                const inputs = card.querySelectorAll('input');
-                const configData = {};
-                
-                inputs.forEach(input => {
-                    configData[input.id] = input.value;
-                });
-                
-                console.log('Enviando configuración:', configData);
-                // Aquí irá la lógica para enviar los datos al servidor
-            });
-        });
-    }
-
-    function initializeCollapsibles() {
-        const collapsibles = document.querySelectorAll('.collapsible');
-        
-        collapsibles.forEach(button => {
-            button.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const content = this.nextElementSibling;
-                
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                }
-                
-                // Cerrar otras secciones
-                collapsibles.forEach(otherButton => {
-                    if (otherButton !== this) {
-                        otherButton.classList.remove('active');
-                        otherButton.nextElementSibling.style.maxHeight = null;
-                    }
-                });
-            });
-        });
-    }
-
-    // Añade esta función a tu inicialización
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeSliders();
-        initializeNavigation();
-        initializeConfigButtons();
-        initializeCollapsibles(); // Añade esta línea
-    });)====";
+// Añade esta función a tu inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSliders();
+    initializeNavigation();
+    initializeConfigButtons();
+    initializeCollapsibles(); // Añade esta línea
+});
+)====";
 const String paginaCSS = R"====(:root {
         /* Modo claro */
         --primary-color: #1a237e;

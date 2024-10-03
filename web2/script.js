@@ -16,8 +16,13 @@ document.querySelectorAll('.control-button').forEach(button => {
         this.classList.toggle('off');
         
         const function_name = this.getAttribute('data-function');
-        const state = this.classList.contains('on') ? 'activada' : 'desactivada';
-        console.log(`Función ${function_name} ${state}`);
+        const state = this.classList.contains('on') ? 'true' : 'false';
+        let configData = {};
+        configData[function_name] = state;
+
+        fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
+        console.log(configData);
+        //console.log(`${function_name} ${state}`);
     });
 });
 
@@ -122,7 +127,7 @@ function initializeConfigButtons() {
         button.addEventListener('click', function() {
             const card = this.closest('.card');
             const inputs = card.querySelectorAll('input');
-            const configData = {};
+            let configData = {};
             
             inputs.forEach(input => {
                 configData[input.id] = input.value;
@@ -130,6 +135,7 @@ function initializeConfigButtons() {
             
             console.log('Enviando configuración:', configData);
             // Aquí irá la lógica para enviar los datos al servidor
+            fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
         });
     });
 }

@@ -591,9 +591,9 @@ void setup(void) {
     wifi1();
     dns1();
     delay(1000);
-    initina();
+   // initina();
     delay(2000);
-    initsd();
+   // initsd();
     initpin();
     ti = millis();
     ta = 0;
