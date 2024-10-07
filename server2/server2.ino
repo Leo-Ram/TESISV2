@@ -39,7 +39,7 @@ INA226 INA(0x40);
 DHT dht(DHT_PIN, DHT11);
 
 WebServer server(80);
-Preferences p;
+Preferences pre;
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
@@ -60,30 +60,64 @@ void configuracion(){
     if (error) {
         Serial.print("Error al parsear JSON: ");
         server.send(400, "text/plain", "Error en el formato JSON");
-    } else {
-        
+    } else {    
         JsonObject obj = doc.as<JsonObject>();
         for (JsonPair p : obj) {
             const char* key = p.key().c_str();
             JsonVariant value = p.value();
-            
+
+            pre.begin("my-app", false);
+            bool bandera = bool(strcmp(key,"carga"));
+            bandera &= bool(strcmp(key,"descarga"));
+            bandera &= bool(strcmp(key,"balance"));
+            bandera &= bool(strcmp(key,"emergencia"));
+            if (!bandera) {
+                bool x = strcmp(value.as<const char*>() , "false");
+                pre.putBool(key, x);
+            }else {
+                float y = value.as<float>();
+                pre.putFloat(key,y);
+            }
+            pre.end();
             Serial.print("Clave: ");
             Serial.print(key);
+
+           // Serial.println(value.as<float>());
+
             Serial.print(" - Valor: ");
             
             // Manejar diferentes tipos de valores
             if (value.is<int>()) {
+                Serial.print("is int ");
                 Serial.println(value.as<int>());
             } else if (value.is<float>()) {
+                Serial.print("is float ");
                 Serial.println(value.as<float>());
             } else if (value.is<const char*>()) {
+                Serial.print("is char ");
                 Serial.println(value.as<const char*>());
+            } else if (value.is<bool>()) {
+                Serial.print("is bool ");
+                Serial.println(value.as<bool>());
             }
         }
-        // Procesar todas las variables mapeadas
+        // Procesar todas las variables mapeadas     
     }
+    imprimirguarda();
     server.send(200,"text/plain","todo correcto");
     digitalWrite(LED,0);
+}
+
+void imprimirguarda() {
+    Serial.println("--------------------"); //
+    pre.begin("my-app", false);
+    Serial.println("Guardando configuracion...");
+    Serial.println("Carga: " + String(pre.getBool("carga", false)));
+    Serial.println("Descarga: " + String(pre.getBool("descarga", false)));
+    Serial.println("Balance: " + String(pre.getBool("balance", false)));
+    Serial.println("Emergencia: " + String(pre.getBool("emergencia", false)));
+    Serial.println("UVP valor " + String(pre.getFloat("UVP",false)));
+    pre.end();
 }
 
 void handleNotFound() {

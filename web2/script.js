@@ -92,12 +92,47 @@ function initializeSliders() {
     const voltageValue = document.getElementById('voltageValue');
     const currentValue = document.getElementById('currentValue');
 
+    const valueVmax = document.getElementById("VMax");
+    const valueVmin = document.getElementById("VMin");
+    const valueMbal = document.getElementById("MBal");
+    const valueMrec = document.getElementById("MRec");
+    const valueImax = document.getElementById("IMax");
+
+    const valueOVP = document.getElementById("OVP");
+    const valueOVPR = document.getElementById("OVPR");
+    const valueUVP = document.getElementById("UVP");
+    const valueUVPR = document.getElementById("UVPR");
+    const valueVbal = document.getElementById("VBal");
+    const valueCCP = document.getElementById("CCP");
+    const valueDCP = document.getElementById("DCP");
+    
+
+    voltageSlider.addEventListener("change", function(){
+        let volMax = valueVmax.value;
+        let margen = volMax - valueVmin.value;
+        let nuevoValor = (voltageSlider.value / 100)*margen //+ valueVmax.value;
+        nuevoValor = volMax - nuevoValor;
+        valueOVP.value = volMax;
+        valueOVPR.value = (volMax - (valueMrec.value)/10).toFixed(2);
+        valueUVP.value = nuevoValor.toFixed(2);
+        valueUVPR.value = (nuevoValor + (valueMrec.value)/10).toFixed(2);
+        valueVbal.value = (volMax - (valueMbal.value)/10).toFixed(2);
+    });
+
+    currentSlider.addEventListener("change", function(){
+        let imax = valueImax.value;
+        let nuevoValor = (currentSlider.value / 100)*imax;
+        valueCCP.value = nuevoValor.toFixed(0);
+        valueDCP.value = nuevoValor.toFixed(0);
+
+    });
+
     function updateSliderValue(slider, valueDisplay) {
         valueDisplay.textContent = slider.value + '%';
     }
 
     voltageSlider.addEventListener('input', () => updateSliderValue(voltageSlider, voltageValue));
-    currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue));
+    currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue)); 
 }
 
 // Función para manejar la navegación entre secciones
@@ -123,9 +158,14 @@ function initializeNavigation() {
 function initializeConfigButtons() {
     const configButtons = document.querySelectorAll('.config-button');
     
-    configButtons.forEach(button => {
+    configButtons.forEach((button,index) => {
         button.addEventListener('click', function() {
-            const card = this.closest('.card');
+            let card;
+            if (index === 0) {
+                card = this.closest(".card").nextElementSibling;
+            }else {
+                card = this.closest('.card');
+            }
             const inputs = card.querySelectorAll('input');
             let configData = {};
             
@@ -135,7 +175,10 @@ function initializeConfigButtons() {
             
             console.log('Enviando configuración:', configData);
             // Aquí irá la lógica para enviar los datos al servidor
-            fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
+            fetch ('/conf',{
+            method:'POST',
+            headers:{'Content-Type': 'application/json'},
+            body: JSON.stringify(configData)});
         });
     });
 }
@@ -170,5 +213,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSliders();
     initializeNavigation();
     initializeConfigButtons();
-    initializeCollapsibles(); // Añade esta línea
+    initializeCollapsibles(); 
 });
+
+// logica de acople
+function ajustarValores() {
+    console.log("ajustar valores.....");
+}

@@ -116,14 +116,14 @@
             <div class="card">
                 <h2>Configuración Básica</h2>
                 <div class="slider-container">
-                    <label for="voltageSlider">Uso de Voltaje (%)</label>
-                    <input type="range" id="voltageSlider" min="0" max="100" value="50" class="slider">
-                    <span id="voltageValue">50%</span>
+                    <label for="voltageSlider">Ciclo de carga (%)</label>
+                    <input type="range" id="voltageSlider" min="0" max="100" value="70" class="slider">
+                    <span id="voltageValue">70%</span>
                 </div>
                 <div class="slider-container">
-                    <label for="currentSlider">Uso de Corriente (%)</label>
-                    <input type="range" id="currentSlider" min="0" max="100" value="50" class="slider">
-                    <span id="currentValue">50%</span>
+                    <label for="currentSlider">Flujo de corriente (%)</label>
+                    <input type="range" id="currentSlider" min="0" max="100" value="100" class="slider">
+                    <span id="currentValue">100%</span>
                 </div>
                 <button class="config-button">Enviar</button>
             </div>
@@ -132,47 +132,47 @@
             <div class="collapsible-section">
                 <button class="collapsible">Configuraciones de Protección</button>
                 <div class="collapsible-content">
-                    <div class="card">
+                    <div class="card card2">
                         <div class="input-grid">
                             <div class="input-group">
                                 <label for="OVP">OVP (V)</label>
-                                <input type="number" id="OVP" step="0.1">
+                                <input type="number" id="OVP" step="0.1" value="4.2">
                             </div>
                             <div class="input-group">
                                 <label for="OVPR">OVPR (V)</label>
-                                <input type="number" id="OVPR" step="0.1">
+                                <input type="number" id="OVPR" step="0.1" value="4">
                             </div>
                             <div class="input-group">
                                 <label for="UVP">UVP (V)</label>
-                                <input type="number" id="UVP" step="0.1">
+                                <input type="number" id="UVP" step="0.1" value="3.2">
                             </div>
                             <div class="input-group">
                                 <label for="UVPR">UVPR (V)</label>
-                                <input type="number" id="UVPR" step="0.1">
+                                <input type="number" id="UVPR" step="0.1" value="3.4">
                             </div>
                             <div class="input-group">
-                                <label for="VBalc">VBalc (V)</label>
-                                <input type="number" id="VBalc" step="0.1">
+                                <label for="VBal">VBal (V)</label>
+                                <input type="number" id="VBal" step="0.1" value="4.2">
                             </div>
                             <div class="input-group">
                                 <label for="CCP">CCP (mA)</label>
-                                <input type="number" id="CCP">
+                                <input type="number" id="CCP" value="1500">
                             </div>
                             <div class="input-group">
                                 <label for="DCP">DCP (mA)</label>
-                                <input type="number" id="DCP">
+                                <input type="number" id="DCP" value="1500">
                             </div>
                             <div class="input-group">
                                 <label for="Tmin">Tmin (°C)</label>
-                                <input type="number" id="Tmin">
+                                <input type="number" id="Tmin" value="4.1">
                             </div>
                             <div class="input-group">
                                 <label for="Tmax">Tmax (°C)</label>
-                                <input type="number" id="Tmax">
+                                <input type="number" id="Tmax" value="60">
                             </div>
                             <div class="input-group">
                                 <label for="Cap">Cap (A/H)</label>
-                                <input type="number" id="Cap" step="0.1">
+                                <input type="number" id="Cap" step="0.1" value="1800">
                             </div>
                         </div>
                         <button class="config-button">Enviar</button>
@@ -191,16 +191,25 @@
                             </div>
                             <div class="input-group">
                                 <label for="VMin">VMin(V)</label>
-                                <input type="number" id="VMin" step="0.1" value="2.8">
+                                <input type="number" id="VMin" step="0.1" value="2.6">
                             </div>
                             <div class="input-group">
                                 <label for="IMax">Imax(mA)</label>
                                 <input type="number" id="IMax" value="1500">
                             </div>
                             <div class="input-group">
-                                <label for="Cap">Cap(A/H)</label>
-                                <input type="number" id="Cap" step="0.1" value="1.8">
+                                <label for="Cap">Cap(mA/H)</label>
+                                <input type="number" id="Cap" step="0.1" value="1800">
                             </div>
+                            <div class="input-group">
+                                <label for="MBal">Margen-Balanceo(mV)</label>
+                                <input type="number" id="MBal" step="0.1" value="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="MRec">Margen-Recuperacion(mV)</label>
+                                <input type="number" id="MRec" step="0.1" value="2">
+                            </div>
+                            
                             <!-- ... resto de los inputs ... -->
                         </div>
                         <button class="config-button">Enviar</button>
@@ -219,23 +228,23 @@
                             </div>
                             <div class="input-group">
                                 <label for="GB2">GB2</label>
-                                <input type="number" id="GB2" value="272">
+                                <input type="number" id="GB2" value="271">
                             </div>
                             <div class="input-group">
                                 <label for="GB3">GB3</label>
-                                <input type="number" id="GB3" value="199.5">
+                                <input type="number" id="GB3" value="199">
                             </div>
                             <div class="input-group">
                                 <label for="GB4">GB4</label>
-                                <input type="number" id="GB4" value="143.6">
+                                <input type="number" id="GB4" value="143.5">
                             </div>
                             <div class="input-group">
                                 <label for="GB5">GB5</label>
-                                <input type="number" id="GB5" value="124.5">
+                                <input type="number" id="GB5" value="124.2">
                             </div>
                             <div class="input-group">
                                 <label for="GB6">GB6</label>
-                                <input type="number" id="GB6" value="102.2">
+                                <input type="number" id="GB6" value="101.7">
                             </div>
                             <div class="input-group">
                                 <label for="GBI">GI</label>

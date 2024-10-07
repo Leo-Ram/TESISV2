@@ -1,7 +1,8 @@
 #ifndef PAGINA_H
 #define PAGINA_H
 
-const String paginaHTML = R"====(<!DOCTYPE html>
+const String paginaHTML = R"====(
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -119,14 +120,14 @@ const String paginaHTML = R"====(<!DOCTYPE html>
             <div class="card">
                 <h2>Configuración Básica</h2>
                 <div class="slider-container">
-                    <label for="voltageSlider">Uso de Voltaje (%)</label>
-                    <input type="range" id="voltageSlider" min="0" max="100" value="50" class="slider">
-                    <span id="voltageValue">50%</span>
+                    <label for="voltageSlider">Ciclo de carga (%)</label>
+                    <input type="range" id="voltageSlider" min="0" max="100" value="70" class="slider">
+                    <span id="voltageValue">70%</span>
                 </div>
                 <div class="slider-container">
-                    <label for="currentSlider">Uso de Corriente (%)</label>
-                    <input type="range" id="currentSlider" min="0" max="100" value="50" class="slider">
-                    <span id="currentValue">50%</span>
+                    <label for="currentSlider">Flujo de corriente (%)</label>
+                    <input type="range" id="currentSlider" min="0" max="100" value="100" class="slider">
+                    <span id="currentValue">100%</span>
                 </div>
                 <button class="config-button">Enviar</button>
             </div>
@@ -135,47 +136,47 @@ const String paginaHTML = R"====(<!DOCTYPE html>
             <div class="collapsible-section">
                 <button class="collapsible">Configuraciones de Protección</button>
                 <div class="collapsible-content">
-                    <div class="card">
+                    <div class="card card2">
                         <div class="input-grid">
                             <div class="input-group">
                                 <label for="OVP">OVP (V)</label>
-                                <input type="number" id="OVP" step="0.1">
+                                <input type="number" id="OVP" step="0.1" value="4.2">
                             </div>
                             <div class="input-group">
                                 <label for="OVPR">OVPR (V)</label>
-                                <input type="number" id="OVPR" step="0.1">
+                                <input type="number" id="OVPR" step="0.1" value="4">
                             </div>
                             <div class="input-group">
                                 <label for="UVP">UVP (V)</label>
-                                <input type="number" id="UVP" step="0.1">
+                                <input type="number" id="UVP" step="0.1" value="3.2">
                             </div>
                             <div class="input-group">
                                 <label for="UVPR">UVPR (V)</label>
-                                <input type="number" id="UVPR" step="0.1">
+                                <input type="number" id="UVPR" step="0.1" value="3.4">
                             </div>
                             <div class="input-group">
-                                <label for="VBalc">VBalc (V)</label>
-                                <input type="number" id="VBalc" step="0.1">
+                                <label for="VBal">VBal (V)</label>
+                                <input type="number" id="VBal" step="0.1" value="4.2">
                             </div>
                             <div class="input-group">
                                 <label for="CCP">CCP (mA)</label>
-                                <input type="number" id="CCP">
+                                <input type="number" id="CCP" value="1500">
                             </div>
                             <div class="input-group">
                                 <label for="DCP">DCP (mA)</label>
-                                <input type="number" id="DCP">
+                                <input type="number" id="DCP" value="1500">
                             </div>
                             <div class="input-group">
                                 <label for="Tmin">Tmin (°C)</label>
-                                <input type="number" id="Tmin">
+                                <input type="number" id="Tmin" value="4.1">
                             </div>
                             <div class="input-group">
                                 <label for="Tmax">Tmax (°C)</label>
-                                <input type="number" id="Tmax">
+                                <input type="number" id="Tmax" value="60">
                             </div>
                             <div class="input-group">
                                 <label for="Cap">Cap (A/H)</label>
-                                <input type="number" id="Cap" step="0.1">
+                                <input type="number" id="Cap" step="0.1" value="1800">
                             </div>
                         </div>
                         <button class="config-button">Enviar</button>
@@ -194,16 +195,25 @@ const String paginaHTML = R"====(<!DOCTYPE html>
                             </div>
                             <div class="input-group">
                                 <label for="VMin">VMin(V)</label>
-                                <input type="number" id="VMin" step="0.1" value="2.8">
+                                <input type="number" id="VMin" step="0.1" value="2.6">
                             </div>
                             <div class="input-group">
                                 <label for="IMax">Imax(mA)</label>
                                 <input type="number" id="IMax" value="1500">
                             </div>
                             <div class="input-group">
-                                <label for="Cap">Cap(A/H)</label>
-                                <input type="number" id="Cap" step="0.1" value="1.8">
+                                <label for="Cap">Cap(mA/H)</label>
+                                <input type="number" id="Cap" step="0.1" value="1800">
                             </div>
+                            <div class="input-group">
+                                <label for="MBal">Margen-Balanceo(mV)</label>
+                                <input type="number" id="MBal" step="0.1" value="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="MRec">Margen-Recuperacion(mV)</label>
+                                <input type="number" id="MRec" step="0.1" value="2">
+                            </div>
+                            
                             <!-- ... resto de los inputs ... -->
                         </div>
                         <button class="config-button">Enviar</button>
@@ -222,23 +232,23 @@ const String paginaHTML = R"====(<!DOCTYPE html>
                             </div>
                             <div class="input-group">
                                 <label for="GB2">GB2</label>
-                                <input type="number" id="GB2" value="272">
+                                <input type="number" id="GB2" value="271">
                             </div>
                             <div class="input-group">
                                 <label for="GB3">GB3</label>
-                                <input type="number" id="GB3" value="199.5">
+                                <input type="number" id="GB3" value="199">
                             </div>
                             <div class="input-group">
                                 <label for="GB4">GB4</label>
-                                <input type="number" id="GB4" value="143.6">
+                                <input type="number" id="GB4" value="143.5">
                             </div>
                             <div class="input-group">
                                 <label for="GB5">GB5</label>
-                                <input type="number" id="GB5" value="124.5">
+                                <input type="number" id="GB5" value="124.2">
                             </div>
                             <div class="input-group">
                                 <label for="GB6">GB6</label>
-                                <input type="number" id="GB6" value="102.2">
+                                <input type="number" id="GB6" value="101.7">
                             </div>
                             <div class="input-group">
                                 <label for="GBI">GI</label>
@@ -267,7 +277,8 @@ const String paginaHTML = R"====(<!DOCTYPE html>
     <script type="module" src="script.javascript">
     </script>
 </body>
-</html>)====";
+</html>
+)====";
 const String paginaJS = R"====(
 // Modo oscuro
 const themeToggle = document.getElementById('themeToggle');
@@ -292,8 +303,8 @@ document.querySelectorAll('.control-button').forEach(button => {
         configData[function_name] = state;
 
         fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
-
-        console.log(`${function_name} ${state}`);
+        console.log(configData);
+        //console.log(`${function_name} ${state}`);
     });
 });
 
@@ -363,12 +374,47 @@ function initializeSliders() {
     const voltageValue = document.getElementById('voltageValue');
     const currentValue = document.getElementById('currentValue');
 
+    const valueVmax = document.getElementById("VMax");
+    const valueVmin = document.getElementById("VMin");
+    const valueMbal = document.getElementById("MBal");
+    const valueMrec = document.getElementById("MRec");
+    const valueImax = document.getElementById("IMax");
+
+    const valueOVP = document.getElementById("OVP");
+    const valueOVPR = document.getElementById("OVPR");
+    const valueUVP = document.getElementById("UVP");
+    const valueUVPR = document.getElementById("UVPR");
+    const valueVbal = document.getElementById("VBal");
+    const valueCCP = document.getElementById("CCP");
+    const valueDCP = document.getElementById("DCP");
+    
+
+    voltageSlider.addEventListener("change", function(){
+        let volMax = valueVmax.value;
+        let margen = volMax - valueVmin.value;
+        let nuevoValor = (voltageSlider.value / 100)*margen //+ valueVmax.value;
+        nuevoValor = volMax - nuevoValor;
+        valueOVP.value = volMax;
+        valueOVPR.value = (volMax - (valueMrec.value)/10).toFixed(2);
+        valueUVP.value = nuevoValor.toFixed(2);
+        valueUVPR.value = (nuevoValor + (valueMrec.value)/10).toFixed(2);
+        valueVbal.value = (volMax - (valueMbal.value)/10).toFixed(2);
+    });
+
+    currentSlider.addEventListener("change", function(){
+        let imax = valueImax.value;
+        let nuevoValor = (currentSlider.value / 100)*imax;
+        valueCCP.value = nuevoValor.toFixed(0);
+        valueDCP.value = nuevoValor.toFixed(0);
+
+    });
+
     function updateSliderValue(slider, valueDisplay) {
         valueDisplay.textContent = slider.value + '%';
     }
 
     voltageSlider.addEventListener('input', () => updateSliderValue(voltageSlider, voltageValue));
-    currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue));
+    currentSlider.addEventListener('input', () => updateSliderValue(currentSlider, currentValue)); 
 }
 
 // Función para manejar la navegación entre secciones
@@ -394,9 +440,14 @@ function initializeNavigation() {
 function initializeConfigButtons() {
     const configButtons = document.querySelectorAll('.config-button');
     
-    configButtons.forEach(button => {
+    configButtons.forEach((button,index) => {
         button.addEventListener('click', function() {
-            const card = this.closest('.card');
+            let card;
+            if (index === 0) {
+                card = this.closest(".card").nextElementSibling;
+            }else {
+                card = this.closest('.card');
+            }
             const inputs = card.querySelectorAll('input');
             let configData = {};
             
@@ -406,7 +457,10 @@ function initializeConfigButtons() {
             
             console.log('Enviando configuración:', configData);
             // Aquí irá la lógica para enviar los datos al servidor
-            fetch ('/conf',{method:'POST',headers:{'Content-Type': 'application/json'},body: JSON.stringify(configData)});
+            fetch ('/conf',{
+            method:'POST',
+            headers:{'Content-Type': 'application/json'},
+            body: JSON.stringify(configData)});
         });
     });
 }
@@ -441,8 +495,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSliders();
     initializeNavigation();
     initializeConfigButtons();
-    initializeCollapsibles(); // Añade esta línea
+    initializeCollapsibles(); 
 });
+
+// logica de acople
+function ajustarValores() {
+    console.log("ajustar valores.....");
+}
 )====";
 const String paginaCSS = R"====(:root {
         /* Modo claro */

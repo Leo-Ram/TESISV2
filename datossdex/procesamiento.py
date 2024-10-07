@@ -6,17 +6,21 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-10-07-sdata1"
+direccion = "datossdex/2024-10-07-data1"
 
-nameColumn = ["B1", "B2", "B3", "B4", "B5", "B6", "I","T","VT","TIME"]
+nameColumn = ["VF","IF","VB","IB","VC","IC","TIME"]
 df = pd.read_csv(direccion+".txt",delimiter=',',names=nameColumn)
+
+df["IB"] = -(df["IB"])
 
 df['TIME'] = pd.to_datetime(df['TIME'])
 
-for i in range(1, 7):
-    df[f'PB{i}'] = (df[f'B{i}'] * df['I'])/1000
+df["PVF"] = df["VF"]*df['IF']/1000
 
-df['PVT'] = (df['VT'] * df['I'])/1000
+df["PVB"] = df["VB"]*df['IB']/1000
+
+df["PVC"] = df["VC"]*df["IC"]/1000
+
 
 #print(df.head(10))
 
