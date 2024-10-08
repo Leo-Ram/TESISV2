@@ -26,46 +26,81 @@ document.querySelectorAll('.control-button').forEach(button => {
     });
 });
 
-// Simulación de recepción de datos
-function updateValues(data, soc) {
-    const values = data.split(',').map(Number);
-    const socValues = soc.split(',').map(Number);
-    
-    // Actualizar voltajes y SOC de baterías
-    for (let i = 1; i <= 6; i++) {
-        const batteryValue = values[i-1].toFixed(1);
-        const socValue = socValues[i-1];
-        
-        document.getElementById(`bat${i}`).textContent = batteryValue;
-        document.getElementById(`soc${i}`).style.width = `${socValue}%`;
-        document.getElementById(`socText${i}`).textContent = `${socValue}%`;
 
 
-        
-        // Actualizar color basado en el porcentaje
-        const socFill = document.getElementById(`soc${i}`);
-        socFill.className = 'percentage-fill ' + getColorClass(socValue);
-    }
-    // Actualizar valores totales y sus SOC
-    const totalElements = [
-        {value: values[6].toFixed(0), soc: socValues[6], id: 'Total'},
-        {value: values[7].toFixed(0), soc: socValues[7], id: 'Current'},
-        {value: values[8].toFixed(0), soc: socValues[8], id: 'Temperature'}
-    ];
-    
-    totalElements.forEach(elem => {
-        document.getElementById(`${elem.id}`).textContent = elem.value;
-        document.getElementById(`soc${elem.id}`).style.width = `${elem.soc}%`;
-        document.getElementById(`socText${elem.id}`).textContent = `${elem.soc}%`;
-        
-        const socFill = document.getElementById(`soc${elem.id}`);    
-        if (elem.id == "Total") {
-            socFill.className = 'percentage-fill ' + getColorClass(elem.soc);
-        }else{
-            socFill.className = 'percentage-fill ' + getColorClass((Math.abs(elem.soc-100)));
-        }
-    });
+const t = 4; //segundos
+let datap = {
+    bat1: 3.1,
+    bat2: 3.2,
+    bat3: 3.3,
+    bat4: 3.4,
+    bat5: 3.5,
+    bat6: 3.6,
+    Total: 23,
+    Current: 150,
+    Temperature: 35, 
 }
+setInterval(() => {
+    const valueVmax = document.getElementById("VMax").value;
+    const valueVmin = document.getElementById("VMin").value;
+    const valueCap = document.getElementById("Cap").value;
+    const valueIMax = document.getElementById("IMax").value;
+    const valueTMin = document.getElementById("TMin").value;
+    const valueTMax = document.getElementById("TMax").value;
+    let m = valueVmax - valueVmin;
+
+    fetch("/lec")
+        .then(response => response.json())
+        .then(data => { 
+/*        let data = {
+            bat1: 3.1,
+            bat2: 3.2,
+            bat3: 3.3,
+            bat4: 3.4,
+            bat5: 3.5,
+            bat6: 3.6,
+            Total: 23,
+            Current: 1000,
+            Temperature: 24, 
+        }*/
+            let soc = {};
+            //updateValues(data.data, data.soc);
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let element = document.getElementById(key);
+                    if (element) {
+                        element.textContent = data[key];
+                        let x = ((parseFloat(datap[key])-valueVmin)/m)
+                        x += ((parseFloat(datap["Current"]))*t)/(valueCap*3600);
+                        x = x *100;
+                        soc["soc"+key] = x;
+                    }
+                }
+            }
+            soc["socTotal"] = ((soc["socbat1"] + soc["socbat2"] + soc["socbat3"] + soc["socbat4"] + soc["socbat5"] + soc["socbat6"])/6);
+            soc["socCurrent"] = (data["Current"]/valueIMax)*100;
+            soc["socTemperature"] = (data["Temperature"]/(valueTMax-valueTMin))*100;
+            for (let key in soc) {
+                if (soc.hasOwnProperty(key)) {
+                    let element = document.getElementById(key);
+                    if (element) {
+                        element.style.width = `${soc[key]}%`;
+                        if (key == "socCurrent" || key == "socTemperature")  {
+                            element.className = "percentage-fill " + getColorClass(Math.abs(soc[key]-120));
+                        }else {
+                            element.className = 'percentage-fill ' + getColorClass(soc[key]);
+                        }                 
+                    }
+                    element = document.getElementById(key+"Text");
+                    if (element) {
+                        element.textContent = `${soc[key].toFixed(0)}%`;
+                    }
+                }
+            }
+            datap = data;
+        });
+    
+}, (t*1000));
 
 function getColorClass(percentage) {
     if (percentage > 70) return 'high';
@@ -73,17 +108,6 @@ function getColorClass(percentage) {
     return 'low';
 }
 
-// Simular obtención de datos cada 5 segundos
-setInterval(() => {
-    const mockData = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50';
-    const mockSOC = '90,85,80,75,70,65,80,60,20';
-    updateValues(mockData, mockSOC);
-}, 5000);
-
-// Actualización inicial
-updateValues('3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50', '90,85,80,75,70,65,80,60,45');
-
-// configurationes seccion
 
 // Función para manejar los sliders
 function initializeSliders() {

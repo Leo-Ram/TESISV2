@@ -45,7 +45,8 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t mutex;
 
-
+float bat[6] = {3.7, 3.8, 3.9, 4.0, 4.1, 4.2};
+float lec[9] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 23.4, 699, 20};
 
 void configuracion(){
     digitalWrite(LED,1);
@@ -78,32 +79,10 @@ void configuracion(){
                 float y = value.as<float>();
                 pre.putFloat(key,y);
             }
-            pre.end();
-            Serial.print("Clave: ");
-            Serial.print(key);
-
-           // Serial.println(value.as<float>());
-
-            Serial.print(" - Valor: ");
-            
-            // Manejar diferentes tipos de valores
-            if (value.is<int>()) {
-                Serial.print("is int ");
-                Serial.println(value.as<int>());
-            } else if (value.is<float>()) {
-                Serial.print("is float ");
-                Serial.println(value.as<float>());
-            } else if (value.is<const char*>()) {
-                Serial.print("is char ");
-                Serial.println(value.as<const char*>());
-            } else if (value.is<bool>()) {
-                Serial.print("is bool ");
-                Serial.println(value.as<bool>());
-            }
+            pre.end();     
         }
-        // Procesar todas las variables mapeadas     
-    }
-    imprimirguarda();
+    }    
+//    imprimirguarda();
     server.send(200,"text/plain","todo correcto");
     digitalWrite(LED,0);
 }
@@ -118,6 +97,23 @@ void imprimirguarda() {
     Serial.println("Emergencia: " + String(pre.getBool("emergencia", false)));
     Serial.println("UVP valor " + String(pre.getFloat("UVP",false)));
     pre.end();
+}
+
+void lecturas() {
+    StaticJsonDocument<200> docLec;  //crear documento json
+    JsonArray data = docLec.createNestedArray("lecturas");  //añadir a documento
+    for (int i = 0; i < 6; i++) {
+        String key = "bat" + String(i + 1);
+        docLec[key] = bat[i];
+    }
+    docLec["Total"] = lec[6];
+    docLec["Current"] = lec[7];
+    docLec["Temperature"] = lec[8];
+
+    // Serializa el objeto JSON a una cadena
+    String json;
+    serializeJson(docLec, json);
+    server.send(200,"application/json", json);
 }
 
 void handleNotFound() {
@@ -153,6 +149,9 @@ void setupServer() {
     //no base
     server.on("/conf", HTTP_POST, []() {
         configuracion();
+    });
+    server.on("/lec", HTTP_GET, []() {
+        lecturas();
     });
     server.onNotFound(handleNotFound);
     server.begin();

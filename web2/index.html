@@ -33,49 +33,49 @@
                     <div class="battery-cell">
                         <p>Batería 1</p>
                         <span id="bat1">--</span>V
-                        <span class="percentage-text" id="socText1">--%</span>
+                        <span class="percentage-text" id="socbat1Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc1"></div>
+                            <div class="percentage-fill" id="socbat1"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 2</p>
                         <span id="bat2">--</span>V
-                        <span class="percentage-text" id="socText2">--%</span>
+                        <span class="percentage-text" id="socbat2Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc2"></div>
+                            <div class="percentage-fill" id="socbat2"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 3</p>
                         <span id="bat3">--</span>V
-                        <span class="percentage-text" id="socText3">--%</span>
+                        <span class="percentage-text" id="socbat3Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc3"></div>
+                            <div class="percentage-fill" id="socbat3"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 4</p>
                         <span id="bat4">--</span>V
-                        <span class="percentage-text" id="socText4">--%</span>
+                        <span class="percentage-text" id="socbat4Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc4"></div>
+                            <div class="percentage-fill" id="socbat4"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 5</p>
                         <span id="bat5">--</span>V
-                        <span class="percentage-text" id="socText5">--%</span>
+                        <span class="percentage-text" id="socbat5Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc5"></div>
+                            <div class="percentage-fill" id="socbat5"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 6</p>
                         <span id="bat6">--</span>V
-                        <span class="percentage-text" id="socText6">--%</span>
+                        <span class="percentage-text" id="socbat6Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc6"></div>
+                            <div class="percentage-fill" id="socbat6"></div>
                         </div>
                     </div>
                 </div>
@@ -86,15 +86,15 @@
                     <div class="total-value">
                         <p>Voltaje Total</p>
                         <span id="Total">--</span>V
-                        <span class="percentage-text" id="socTextTotal">--%</span>
+                        <span class="percentage-text" id="socTotalText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socTotal"></div>
                         </div>
                     </div>
                     <div class="total-value">
                         <p>Corriente</p>
-                        <span id="Current">--</span>A
-                        <span class="percentage-text" id="socTextCurrent">--%</span>
+                        <span id="Current">--</span>mA
+                        <span class="percentage-text" id="socCurrentText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socCurrent"></div>
                         </div>
@@ -102,7 +102,7 @@
                     <div class="total-value">
                         <p>Temperatura</p>
                         <span id="Temperature">--</span>°C
-                        <span class="percentage-text" id="socTextTemperature">--%</span>
+                        <span class="percentage-text" id="socTemperatureText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socTemperature"></div>
                         </div>    
@@ -163,12 +163,12 @@
                                 <input type="number" id="DCP" value="1500">
                             </div>
                             <div class="input-group">
-                                <label for="Tmin">Tmin (°C)</label>
-                                <input type="number" id="Tmin" value="4.1">
+                                <label for="TMin">Tmin (°C)</label>
+                                <input type="number" id="TMin" value="4.1">
                             </div>
                             <div class="input-group">
-                                <label for="Tmax">Tmax (°C)</label>
-                                <input type="number" id="Tmax" value="60">
+                                <label for="TMax">Tmax (°C)</label>
+                                <input type="number" id="TMax" value="60">
                             </div>
                             <div class="input-group">
                                 <label for="Cap">Cap (A/H)</label>

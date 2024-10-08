@@ -37,49 +37,49 @@ const String paginaHTML = R"====(
                     <div class="battery-cell">
                         <p>Batería 1</p>
                         <span id="bat1">--</span>V
-                        <span class="percentage-text" id="socText1">--%</span>
+                        <span class="percentage-text" id="socbat1Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc1"></div>
+                            <div class="percentage-fill" id="socbat1"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 2</p>
                         <span id="bat2">--</span>V
-                        <span class="percentage-text" id="socText2">--%</span>
+                        <span class="percentage-text" id="socbat2Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc2"></div>
+                            <div class="percentage-fill" id="socbat2"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 3</p>
                         <span id="bat3">--</span>V
-                        <span class="percentage-text" id="socText3">--%</span>
+                        <span class="percentage-text" id="socbat3Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc3"></div>
+                            <div class="percentage-fill" id="socbat3"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 4</p>
                         <span id="bat4">--</span>V
-                        <span class="percentage-text" id="socText4">--%</span>
+                        <span class="percentage-text" id="socbat4Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc4"></div>
+                            <div class="percentage-fill" id="socbat4"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 5</p>
                         <span id="bat5">--</span>V
-                        <span class="percentage-text" id="socText5">--%</span>
+                        <span class="percentage-text" id="socbat5Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc5"></div>
+                            <div class="percentage-fill" id="socbat5"></div>
                         </div>
                     </div>
                     <div class="battery-cell">
                         <p>Batería 6</p>
                         <span id="bat6">--</span>V
-                        <span class="percentage-text" id="socText6">--%</span>
+                        <span class="percentage-text" id="socbat6Text">--%</span>
                         <div class="percentage-bar">
-                            <div class="percentage-fill" id="soc6"></div>
+                            <div class="percentage-fill" id="socbat6"></div>
                         </div>
                     </div>
                 </div>
@@ -90,15 +90,15 @@ const String paginaHTML = R"====(
                     <div class="total-value">
                         <p>Voltaje Total</p>
                         <span id="Total">--</span>V
-                        <span class="percentage-text" id="socTextTotal">--%</span>
+                        <span class="percentage-text" id="socTotalText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socTotal"></div>
                         </div>
                     </div>
                     <div class="total-value">
                         <p>Corriente</p>
-                        <span id="Current">--</span>A
-                        <span class="percentage-text" id="socTextCurrent">--%</span>
+                        <span id="Current">--</span>mA
+                        <span class="percentage-text" id="socCurrentText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socCurrent"></div>
                         </div>
@@ -106,7 +106,7 @@ const String paginaHTML = R"====(
                     <div class="total-value">
                         <p>Temperatura</p>
                         <span id="Temperature">--</span>°C
-                        <span class="percentage-text" id="socTextTemperature">--%</span>
+                        <span class="percentage-text" id="socTemperatureText">--%</span>
                         <div class="percentage-bar large">
                             <div class="percentage-fill" id="socTemperature"></div>
                         </div>    
@@ -167,12 +167,12 @@ const String paginaHTML = R"====(
                                 <input type="number" id="DCP" value="1500">
                             </div>
                             <div class="input-group">
-                                <label for="Tmin">Tmin (°C)</label>
-                                <input type="number" id="Tmin" value="4.1">
+                                <label for="TMin">Tmin (°C)</label>
+                                <input type="number" id="TMin" value="4.1">
                             </div>
                             <div class="input-group">
-                                <label for="Tmax">Tmax (°C)</label>
-                                <input type="number" id="Tmax" value="60">
+                                <label for="TMax">Tmax (°C)</label>
+                                <input type="number" id="TMax" value="60">
                             </div>
                             <div class="input-group">
                                 <label for="Cap">Cap (A/H)</label>
@@ -308,46 +308,81 @@ document.querySelectorAll('.control-button').forEach(button => {
     });
 });
 
-// Simulación de recepción de datos
-function updateValues(data, soc) {
-    const values = data.split(',').map(Number);
-    const socValues = soc.split(',').map(Number);
-    
-    // Actualizar voltajes y SOC de baterías
-    for (let i = 1; i <= 6; i++) {
-        const batteryValue = values[i-1].toFixed(1);
-        const socValue = socValues[i-1];
-        
-        document.getElementById(`bat${i}`).textContent = batteryValue;
-        document.getElementById(`soc${i}`).style.width = `${socValue}%`;
-        document.getElementById(`socText${i}`).textContent = `${socValue}%`;
 
 
-        
-        // Actualizar color basado en el porcentaje
-        const socFill = document.getElementById(`soc${i}`);
-        socFill.className = 'percentage-fill ' + getColorClass(socValue);
-    }
-    // Actualizar valores totales y sus SOC
-    const totalElements = [
-        {value: values[6].toFixed(0), soc: socValues[6], id: 'Total'},
-        {value: values[7].toFixed(0), soc: socValues[7], id: 'Current'},
-        {value: values[8].toFixed(0), soc: socValues[8], id: 'Temperature'}
-    ];
-    
-    totalElements.forEach(elem => {
-        document.getElementById(`${elem.id}`).textContent = elem.value;
-        document.getElementById(`soc${elem.id}`).style.width = `${elem.soc}%`;
-        document.getElementById(`socText${elem.id}`).textContent = `${elem.soc}%`;
-        
-        const socFill = document.getElementById(`soc${elem.id}`);    
-        if (elem.id == "Total") {
-            socFill.className = 'percentage-fill ' + getColorClass(elem.soc);
-        }else{
-            socFill.className = 'percentage-fill ' + getColorClass((Math.abs(elem.soc-100)));
-        }
-    });
+const t = 4; //segundos
+let datap = {
+    bat1: 3.1,
+    bat2: 3.2,
+    bat3: 3.3,
+    bat4: 3.4,
+    bat5: 3.5,
+    bat6: 3.6,
+    Total: 23,
+    Current: 150,
+    Temperature: 35, 
 }
+setInterval(() => {
+    const valueVmax = document.getElementById("VMax").value;
+    const valueVmin = document.getElementById("VMin").value;
+    const valueCap = document.getElementById("Cap").value;
+    const valueIMax = document.getElementById("IMax").value;
+    const valueTMin = document.getElementById("TMin").value;
+    const valueTMax = document.getElementById("TMax").value;
+    let m = valueVmax - valueVmin;
+
+    fetch("/lec")
+        .then(response => response.json())
+        .then(data => { 
+/*        let data = {
+            bat1: 3.1,
+            bat2: 3.2,
+            bat3: 3.3,
+            bat4: 3.4,
+            bat5: 3.5,
+            bat6: 3.6,
+            Total: 23,
+            Current: 1000,
+            Temperature: 24, 
+        }*/
+            let soc = {};
+            //updateValues(data.data, data.soc);
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let element = document.getElementById(key);
+                    if (element) {
+                        element.textContent = data[key];
+                        let x = ((parseFloat(datap[key])-valueVmin)/m)
+                        x += ((parseFloat(datap["Current"]))*t)/(valueCap*3600);
+                        x = x *100;
+                        soc["soc"+key] = x;
+                    }
+                }
+            }
+            soc["socTotal"] = ((soc["socbat1"] + soc["socbat2"] + soc["socbat3"] + soc["socbat4"] + soc["socbat5"] + soc["socbat6"])/6);
+            soc["socCurrent"] = (data["Current"]/valueIMax)*100;
+            soc["socTemperature"] = (data["Temperature"]/(valueTMax-valueTMin))*100;
+            for (let key in soc) {
+                if (soc.hasOwnProperty(key)) {
+                    let element = document.getElementById(key);
+                    if (element) {
+                        element.style.width = `${soc[key]}%`;
+                        if (key == "socCurrent" || key == "socTemperature")  {
+                            element.className = "percentage-fill " + getColorClass(Math.abs(soc[key]-120));
+                        }else {
+                            element.className = 'percentage-fill ' + getColorClass(soc[key]);
+                        }                 
+                    }
+                    element = document.getElementById(key+"Text");
+                    if (element) {
+                        element.textContent = `${soc[key].toFixed(0)}%`;
+                    }
+                }
+            }
+            datap = data;
+        });
+    
+}, (t*1000));
 
 function getColorClass(percentage) {
     if (percentage > 70) return 'high';
@@ -355,17 +390,6 @@ function getColorClass(percentage) {
     return 'low';
 }
 
-// Simular obtención de datos cada 5 segundos
-setInterval(() => {
-    const mockData = '3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50';
-    const mockSOC = '90,85,80,75,70,65,80,60,20';
-    updateValues(mockData, mockSOC);
-}, 5000);
-
-// Actualización inicial
-updateValues('3.1,3.2,3.3,3.4,3.5,3.6,21.1,500,50', '90,85,80,75,70,65,80,60,45');
-
-// configurationes seccion
 
 // Función para manejar los sliders
 function initializeSliders() {
