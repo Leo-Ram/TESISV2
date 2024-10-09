@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-10-07-sdata1"
+direccion = "datossd/2024-10-08-sdata2"
 
 nameColumn = ["B1", "B2", "B3", "B4", "B5", "B6", "I","T","VT","TIME"]
 df = pd.read_csv(direccion+".txt",delimiter=',',names=nameColumn)

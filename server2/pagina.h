@@ -25,10 +25,10 @@ const String paginaHTML = R"====(
 
     <main class="container">
         <div class="controls">
-            <button class="control-button off" data-function="carga">Carga</button>
-            <button class="control-button off" data-function="descarga">Descarga</button>
-            <button class="control-button off" data-function="balance">Balance</button>
-            <button class="control-button off" data-function="emergencia">Emergencia</button>
+            <button class="control-button off" data-function="carga" id="carga">Carga</button>
+            <button class="control-button off" data-function="descarga" id="descarga">Descarga</button>
+            <button class="control-button off" data-function="balance" id="balance">Balance</button>
+            <button class="control-button off" data-function="emergencia" id="emergencia">Emergencia</button>
         </div>
         <div class="monitoring-panel">
             <div class="card">
@@ -202,8 +202,8 @@ const String paginaHTML = R"====(
                                 <input type="number" id="IMax" value="1500">
                             </div>
                             <div class="input-group">
-                                <label for="Cap">Cap(mA/H)</label>
-                                <input type="number" id="Cap" step="0.1" value="1800">
+                                <label for="ACap">ACap(mA/H)</label>
+                                <input type="number" id="ACap" step="0.1" value="1800">
                             </div>
                             <div class="input-group">
                                 <label for="MBal">Margen-Balanceo(mV)</label>
@@ -351,7 +351,7 @@ setInterval(() => {
                 if (data.hasOwnProperty(key)) {
                     let element = document.getElementById(key);
                     if (element) {
-                        element.textContent = data[key];
+                        element.textContent = data[key].toFixed(2);
                         let x = ((parseFloat(datap[key])-valueVmin)/m)
                         x += ((parseFloat(datap["Current"]))*t)/(valueCap*3600);
                         x = x *100;
@@ -526,6 +526,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function ajustarValores() {
     console.log("ajustar valores.....");
 }
+
+window.addEventListener("load",async () => {
+    try{
+        setTimeout( () => {
+            fetch("/datasaved")
+            .then(response => response.json())
+            .then( data =>{
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        let element = document.getElementById(key);
+                        if (element) {
+                            if (key == "carga" || key == "descarga" || key == "balance" || key == "emergencia") {
+                                element.classList.remove("on" , "off");
+                                if (data[key]) {
+                                    element.classList.add("on");
+                                }else {
+                                    element.classList.add("off");
+                                }
+                            }else {
+                                element.value = data[key];
+                            }
+                        }
+                    }
+                }
+            })
+        },2000)
+    }catch (error){console.error("red no disponible");}
+})
 )====";
 const String paginaCSS = R"====(:root {
         /* Modo claro */

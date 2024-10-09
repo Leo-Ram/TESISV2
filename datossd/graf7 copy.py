@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-10-07-sdata1p"
+direccion = "datossd/2024-10-08-sdata2p"
 
 df = pd.read_csv(direccion+".csv")
 
@@ -66,8 +66,8 @@ def plot_variables_and_power(df, start_time, end_time):
 
 
 # Definir el intervalo de tiempo (ajusta estos valores según tus necesidades)
-start_time = pd.to_datetime('2024-01-01 00:00:02')
-end_time = pd.to_datetime('2024-01-01 03:42:56')
+start_time = pd.to_datetime('2024-01-01 00:00:00')
+end_time = pd.to_datetime('2024-01-01 02:45:33')
 
 # Llamar a la función para crear los gráficos
 plot_variables_and_power(df, start_time, end_time)

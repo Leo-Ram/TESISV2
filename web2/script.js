@@ -69,7 +69,7 @@ setInterval(() => {
                 if (data.hasOwnProperty(key)) {
                     let element = document.getElementById(key);
                     if (element) {
-                        element.textContent = data[key];
+                        element.textContent = data[key].toFixed(2); 
                         let x = ((parseFloat(datap[key])-valueVmin)/m)
                         x += ((parseFloat(datap["Current"]))*t)/(valueCap*3600);
                         x = x *100;
@@ -244,3 +244,31 @@ document.addEventListener('DOMContentLoaded', function() {
 function ajustarValores() {
     console.log("ajustar valores.....");
 }
+
+window.addEventListener("load",async () => {
+    try{
+        setTimeout( () => {
+            fetch("/datasaved")
+            .then(response => response.json())
+            .then( data =>{
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        let element = document.getElementById(key);
+                        if (element) {
+                            if (key == "carga" || key == "descarga" || key == "balance" || key == "emergencia") {
+                                element.classList.remove("on" , "off");
+                                if (data[key]) {
+                                    element.classList.add("on");
+                                }else {
+                                    element.classList.add("off");
+                                }
+                            }else {
+                                element.value = data[key];
+                            }
+                        }
+                    }
+                }
+            })
+        },2000)
+    }catch (error){console.error("red no disponible");}
+})
