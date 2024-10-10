@@ -74,163 +74,179 @@ void tiempoin() {
   ta = 0;
 }
 
+const char* CONFIG_FILE = "/config.json";
+
 void estado() {
-  pre.begin("my-app", false);
-  g[9] = 0;
-  pre.putFloat("GS", 0);
-  pre.end();
+  DynamicJsonDocument doc(1024);
+  doc["GS"] = 0;
+  
+  File configFile = SD.open(CONFIG_FILE, FILE_WRITE);
+  if (!configFile) {
+    Serial.println("Failed to open config file for writing");
+    return;
+  }
+  
+  serializeJson(doc, configFile);
+  configFile.close();
 }
 
 void actualVariable() {
-  pre.begin("my-app", false);
-  g[0] = pre.getFloat("GB1", 588);
-  g[1] = pre.getFloat("GB2", 271);
-  g[2] = pre.getFloat("GB3", 199);
-  g[3] = pre.getFloat("GB4", 143.5);
-  g[4] = pre.getFloat("GB5", 124.2);
-  g[5] = pre.getFloat("GB6", 101.7);
-  g[6] = pre.getFloat("GBI", 4.8);
-  g[7] = pre.getFloat("GT", 1.0);
-  g[8] = pre.getFloat("GANG", 0);
-  g[9] = pre.getFloat("GS", 0);
-  conf[0] = pre.getFloat("OVP", 4.2);
-  conf[1] = pre.getFloat("OVPR", 4);
-  conf[2] = pre.getFloat("UVP", 3);
-  conf[3] = pre.getFloat("UVPR", 3.4);
-  conf[4] = pre.getFloat("VBal", 4.15);
-  conf[5] = pre.getFloat("CCP", 1500);
-  conf[6] = pre.getFloat("DCP", 1500);
-  conf[7] = pre.getFloat("TMin", 4);
-  conf[8] = pre.getFloat("TMax", 60);
-  conf[9] = pre.getFloat("Cap", 1800);
-  absolut[0] = pre.getFloat("VMax", 4.2);
-  absolut[1] = pre.getFloat("VMin", 2.6);
-  absolut[2] = pre.getFloat("IMax", 1500);
-  absolut[3] = pre.getFloat("ACap", 1800);
-  absolut[4] = pre.getFloat("MBal", 1);
-  absolut[5] = pre.getFloat("MRec", 2);
-  boton[0] = pre.getBool("carga", false);
-  boton[1] = pre.getBool("descarga", false);
-  boton[2] = pre.getBool("balance", false);
-  boton[3] = pre.getBool("emergencia", false);
-  Serial.println("whatasaaa ------ actual variable");
-  Serial.println(boton[0]);
-  pre.end();
+  File configFile = SD.open(CONFIG_FILE);
+  if (!configFile) {
+    Serial.println("Failed to open config file for reading");
+    return;
+  }
+  
+  DynamicJsonDocument doc(2048);
+  DeserializationError error = deserializeJson(doc, configFile);
+  configFile.close();
+  
+  if (error) {
+    Serial.println("Failed to parse config file");
+    return;
+  }
+  
+  // Valores g[]
+  g[0] = doc["GB1"] | 588.0f;
+  g[1] = doc["GB2"] | 271.0f;
+  g[2] = doc["GB3"] | 199.0f;
+  g[3] = doc["GB4"] | 143.5f;
+  g[4] = doc["GB5"] | 124.2f;
+  g[5] = doc["GB6"] | 101.7f;
+  g[6] = doc["GBI"] | 4.8f;
+  g[7] = doc["GT"] | 1.0f;
+  g[8] = doc["GANG"] | 0.0f;
+  g[9] = doc["GS"] | 0.0f;
+  
+  // Valores conf[]
+  conf[0] = doc["OVP"] | 4.2f;
+  conf[1] = doc["OVPR"] | 4.0f;
+  conf[2] = doc["UVP"] | 3.0f;
+  conf[3] = doc["UVPR"] | 3.4f;
+  conf[4] = doc["VBal"] | 4.15f;
+  conf[5] = doc["CCP"] | 1500.0f;
+  conf[6] = doc["DCP"] | 1500.0f;
+  conf[7] = doc["TMin"] | 4.0f;
+  conf[8] = doc["TMax"] | 60.0f;
+  conf[9] = doc["Cap"] | 1800.0f;
+  
+  // Valores absolut[]
+  absolut[0] = doc["VMax"] | 4.2f;
+  absolut[1] = doc["VMin"] | 2.6f;
+  absolut[2] = doc["IMax"] | 1500.0f;
+  absolut[3] = doc["ACap"] | 1800.0f;
+  absolut[4] = doc["MBal"] | 1.0f;
+  absolut[5] = doc["MRec"] | 2.0f;
+  
+  // Valores boton[]
+  boton[0] = doc["carga"] | false;
+  boton[1] = doc["descarga"] | false;
+  boton[2] = doc["balance"] | false;
+  boton[3] = doc["emergencia"] | false;
 }
 
-
-
-// En tu función de manejo de la petición HTTP
 void handleGetConfig() {
-
-  DynamicJsonDocument docdata(2048);  // Ajusta el tamaño según necesites
-
-  pre.begin("my-app", false);
-
-  // Valores g[]
-  docdata["GB1"] = pre.getFloat("GB1", 588);
-  docdata["GB2"] = pre.getFloat("GB2", 271);
-  docdata["GB3"] = pre.getFloat("GB3", 199);
-  docdata["GB4"] = pre.getFloat("GB4", 143.5);
-  docdata["GB5"] = pre.getFloat("GB5", 124.2);
-  docdata["GB6"] = pre.getFloat("GB6", 101.7);
-  docdata["GBI"] = pre.getFloat("GBI", 4.8);
-  docdata["GT"] = pre.getFloat("GT", 1.0);
-  docdata["GANG"] = pre.getFloat("GANG", 0);
-  docdata["GS"] = pre.getFloat("GS", 0);
-
-  // Valores conf[]
-  docdata["OVP"] = pre.getFloat("OVP", 4.2);
-  docdata["OVPR"] = pre.getFloat("OVPR", 4);
-  docdata["UVP"] = pre.getFloat("UVP", 3);
-  docdata["UVPR"] = pre.getFloat("UVPR", 3.4);
-  docdata["VBal"] = pre.getFloat("VBal", 4.15);
-  docdata["CCP"] = pre.getFloat("CCP", 1500);
-  docdata["DCP"] = pre.getFloat("DCP", 1500);
-  docdata["TMin"] = pre.getFloat("TMin", 4);
-  docdata["TMax"] = pre.getFloat("TMax", 59);
-  docdata["Cap"] = pre.getFloat("Cap", 1800);
-
-  // Valores absolut[]
-  docdata["VMax"] = pre.getFloat("VMax", 4.2);
-  docdata["VMin"] = pre.getFloat("VMin", 2.6);
-  docdata["IMax"] = pre.getFloat("IMax", 1500);
-  docdata["ACap"] = pre.getFloat("ACap", 1800);  // Cambié el nombre para evitar duplicado
-  docdata["MBal"] = pre.getFloat("MBal", 1);
-  docdata["MRec"] = pre.getFloat("MRec", 2);
-
-  // Valores boton[]
-  docdata["carga"] = pre.getBool("carga", false);
-  docdata["descarga"] = pre.getBool("descarga", false);
-  docdata["balance"] = pre.getBool("balance", false);
-  docdata["emergencia"] = pre.getBool("emergencia", false);
-  pre.end();
-
-  String json;
-  serializeJson(docdata, json);
+  File configFile = SD.open(CONFIG_FILE);
+  if (!configFile) {
+    server.send(500, "text/plain", "Failed to open config file");
+    return;
+  }
+  
+  String json = configFile.readString();
+  configFile.close();
+  
   server.send(200, "application/json", json);
 }
+//----------------------------------------
+
+
+// ... (mantener las otras funciones como están) ...
 
 void configuracion() {
-  digitalWrite(LED_PIN, 1);
-  String json = server.arg("plain");
-  Serial.println(json);
+  digitalWrite(LED_PIN, HIGH);
+  String newJson = server.arg("plain");
+  Serial.println("Nuevos datos recibidos: " + newJson);
 
-  // Crear un documento JSON
-  StaticJsonDocument<1024> doc;
-
-  DeserializationError error = deserializeJson(doc, json);
-  //Serial.println(doc);
+  // Documento JSON para los nuevos datos
+  DynamicJsonDocument newDoc(1024);
+  DeserializationError error = deserializeJson(newDoc, newJson);
+  
   if (error) {
-    Serial.print("Error al parsear JSON: ");
+    Serial.println("Error al parsear JSON nuevo");
     server.send(400, "text/plain", "Error en el formato JSON");
-  } else {
-    pre.begin("my-app", false);
-    JsonObject obj = doc.as<JsonObject>();
-    for (JsonPair p : obj) {
-      const char* key = p.key().c_str();
-      JsonVariant value = p.value();
-
-      bool bandera = bool(strcmp(key, "carga"));
-      bandera &= bool(strcmp(key, "descarga"));
-      bandera &= bool(strcmp(key, "balance"));
-      bandera &= bool(strcmp(key, "emergencia"));
-      if (!bandera) {
-        Serial.println("Bandera de boton");
-        bool x = strcmp(value.as<const char*>(), "false");
-        Serial.print(" key ");
-        Serial.print(key);
-        Serial.print(" Valor ");
-        Serial.println(x);
-        pre.putBool(key, x);
-      } else {
-        float y = value.as<float>();
-        Serial.print(" keyf ");
-        Serial.print(key);
-        Serial.print(" Valor ");
-        Serial.println(y);
-        pre.putFloat(key, y);
-      }
-    }
-    pre.end();
+    digitalWrite(LED_PIN, LOW);
+    return;
   }
-  //    imprimirguarda();
-  server.send(200, "text/plain", "todo correcto");
+
+  // Cargar configuración existente
+  DynamicJsonDocument existingDoc(2048);
+  File configFile = SD.open(CONFIG_FILE);
+  if (configFile) {
+    DeserializationError existingError = deserializeJson(existingDoc, configFile);
+    configFile.close();
+    
+    if (existingError) {
+      Serial.println("Error al parsear JSON existente");
+    }
+  }
+
+  // Actualizar solo los campos recibidos
+  JsonObject newObj = newDoc.as<JsonObject>();
+  for (JsonPair p : newObj) {
+    const char* key = p.key().c_str();
+    JsonVariant value = p.value();
+
+    // Verificar si es un booleano
+    if (strcmp(key, "carga") == 0 || 
+        strcmp(key, "descarga") == 0 || 
+        strcmp(key, "balance") == 0 || 
+        strcmp(key, "emergencia") == 0) {
+      bool boolValue = value.as<bool>();
+      existingDoc[key] = boolValue;
+      Serial.print("Actualizando booleano - Key: ");
+      Serial.print(key);
+      Serial.print(" Valor: ");
+      Serial.println(boolValue);
+    } else {
+      // Es un valor flotante
+      float floatValue = value.as<float>();
+      existingDoc[key] = floatValue;
+      Serial.print("Actualizando flotante - Key: ");
+      Serial.print(key);
+      Serial.print(" Valor: ");
+      Serial.println(floatValue);
+    }
+  }
+
+  // Guardar la configuración actualizada
+  configFile = SD.open(CONFIG_FILE, FILE_WRITE);
+  if (!configFile) {
+    server.send(500, "text/plain", "Error al abrir archivo para escritura");
+    digitalWrite(LED_PIN, LOW);
+    return;
+  }
+
+  serializeJson(existingDoc, configFile);
+  configFile.close();
+
+  server.send(200, "text/plain", "Configuración actualizada correctamente");
   actualVariable();
-  digitalWrite(LED_PIN, 0);
+  digitalWrite(LED_PIN, LOW);
 }
 
-void imprimirguarda() {
-  Serial.println("--------------------");  //
-  pre.begin("my-app", false);
-  Serial.println("Guardando configuracion...");
-  Serial.println("Carga: " + String(pre.getBool("carga", false)));
-  Serial.println("Descarga: " + String(pre.getBool("descarga", false)));
-  Serial.println("Balance: " + String(pre.getBool("balance", false)));
-  Serial.println("Emergencia: " + String(pre.getBool("emergencia", false)));
-  Serial.println("UVP valor " + String(pre.getFloat("UVP", false)));
-  pre.end();
+// Función auxiliar para imprimir el contenido actual del archivo (útil para depuración)
+void printCurrentConfig() {
+  File configFile = SD.open(CONFIG_FILE);
+  if (configFile) {
+    Serial.println("Configuración actual:");
+    while (configFile.available()) {
+      Serial.write(configFile.read());
+    }
+    Serial.println();
+    configFile.close();
+  }
 }
+//----------------------------------------------------------------
 
 void lecturas() {
   StaticJsonDocument<200> docLec;                         //crear documento json
