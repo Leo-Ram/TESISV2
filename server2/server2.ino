@@ -25,14 +25,14 @@
 #define MXB_PIN 14
 #define MXC_PIN 12
 #define LED_PIN 2
-#define B1_PIN 32
-#define B2_PIN 33
+#define B1_PIN 32 //balance bat1
+#define B2_PIN 33 //balance bat2
 #define B3_PIN 15
 #define B4_PIN 4
 #define B5_PIN 16
 #define B6_PIN 17
-#define OVP_PIN 25
-#define UVP_PIN 26
+#define OVP_PIN 25  //contro overvoltage
+#define UVP_PIN 26  //control undervoltage
 
 const int pin[] = { MXA_PIN, MXB_PIN, MXC_PIN, LED_PIN, B1_PIN, B2_PIN, B3_PIN, B4_PIN, B5_PIN, B6_PIN, OVP_PIN, UVP_PIN };
 INA226 INA(0x40);
@@ -119,16 +119,16 @@ void actualVariable() {
   g[9] = doc["GS"] | 0.0f;
   
   // Valores conf[]
-  conf[0] = doc["OVP"] | 4.2f;
-  conf[1] = doc["OVPR"] | 4.0f;
-  conf[2] = doc["UVP"] | 3.0f;
-  conf[3] = doc["UVPR"] | 3.4f;
-  conf[4] = doc["VBal"] | 4.15f;
-  conf[5] = doc["CCP"] | 1500.0f;
-  conf[6] = doc["DCP"] | 1500.0f;
-  conf[7] = doc["TMin"] | 4.0f;
-  conf[8] = doc["TMax"] | 60.0f;
-  conf[9] = doc["Cap"] | 1800.0f;
+  conf[0] = doc["OVP"] | 4.2f;  // over voltage protection
+  conf[1] = doc["OVPR"] | 4.0f;   // over voltage protection recovery
+  conf[2] = doc["UVP"] | 3.0f;    //under voltage protection
+  conf[3] = doc["UVPR"] | 3.4f;   // under voltage protection recovery
+  conf[4] = doc["VBal"] | 4.15f;  //voltage balancing
+  conf[5] = doc["CCP"] | 1500.0f; //maximum charging current
+  conf[6] = doc["DCP"] | 1500.0f; //maximum discharging current
+  conf[7] = doc["TMin"] | 4.0f;   //minimum temperature
+  conf[8] = doc["TMax"] | 60.0f; //maximum temperature
+  conf[9] = doc["Cap"] | 1800.0f; // capacity
   
   // Valores absolut[]
   absolut[0] = doc["VMax"] | 4.2f;
@@ -201,7 +201,7 @@ void configuracion() {
         strcmp(key, "descarga") == 0 || 
         strcmp(key, "balance") == 0 || 
         strcmp(key, "emergencia") == 0) {
-      bool boolValue = value.as<bool>();
+      bool boolValue = strcmp(value.as<const char*>(), "false");
       existingDoc[key] = boolValue;
       Serial.print("Actualizando booleano - Key: ");
       Serial.print(key);
@@ -313,9 +313,183 @@ void leer() {
   escribirsd();
 }
 
-//----------------------------------------------------------------control
 
-void apagar() {
+//----------------------------------------------------------------contro 0
+
+void controlBaterias() {
+  // Verificación de temperatura
+  bool tempOK = (lec[7] >= conf[7] && lec[7] <= conf[8]); 
+  // Si la temperatura está fuera de rango, apagar todo excepto en emergencia
+  if (!tempOK && !boton[3]) {
+    apagarTodo();
+    return;
+  }
+  // Control de emergencia
+  if (boton[3]) {
+    modoEmergencia();
+    return;
+  }
+  // Control de carga
+  if (boton[0]) {
+    controlCarga();
+  } else {
+    analogWrite(OVP_PIN, 255);  // Apagar carga
+  }
+  // Control de descarga
+  if (boton[1]) {
+    controlDescarga();
+  } else {
+    analogWrite(UVP_PIN, 255);  // Apagar descarga
+  }
+  // Control de balance
+  if (boton[2]) {
+    controlBalance();
+  } else {
+    apagarBalance();
+  }
+}
+
+void controlCarga() {
+  bool todasBajasOVPR = true;
+  bool algunaAlta = false;
+  
+  for (int i = 0; i < 6; i++) {
+    if (bat[i] >= conf[0]) {  // OVP
+      algunaAlta = true;
+      break;
+    }
+    if (bat[i] > conf[1]) {  // OVPR
+      todasBajasOVPR = false;
+    }
+  }
+
+  static bool cargaActiva = false;
+  
+  if (algunaAlta) {
+    analogWrite(OVP_PIN, 255);  // Apagar carga
+    cargaActiva = false;
+  } else if (todasBajasOVPR && !cargaActiva) {
+    cargaActiva = true;
+  }
+
+  if (cargaActiva) {
+    ajustarCorrienteCarga();
+  }
+}
+
+
+void ajustarCorrienteCarga() {
+  static uint8_t valorPWM = 0;
+  if (abs(lec[6] - conf[5]) < 100) {
+    return;  // Si estamos cerca del objetivo, no ajustar
+  }
+
+  // Ajuste rápido de corriente
+  if (lec[6] > conf[5]) {
+    while ((lec[6] > conf[5]) && (valorPWM < 255)){
+      valorPWM = min(255, valorPWM + 5);
+      analogWrite(OVP_PIN, valorPWM);
+      vTaskDelay(pdMS_TO_TICKS(10));
+      lec[6] = INA.getCurrent_mA();
+    }  
+  } else {
+    valorPWM = max(0, valorPWM - 5);
+  }
+  
+  analogWrite(OVP_PIN, valorPWM);
+}
+
+void controlDescarga() {
+  bool todasBajasUVPR = true;
+  bool algunaBaja = false;
+  
+  for (int i = 0; i < 6; i++) {
+    if (bat[i] <= conf[2]) {  // OVP
+      algunaBaja = true;
+      break;
+    }
+    if (bat[i] < conf[3]) {  // OVPR
+      todasBajasUVPR = false;
+    }
+  }
+
+  static bool descargaActiva = false;
+  
+  if (algunaBaja) {
+    analogWrite(OVP_PIN, 255);  // Apagar carga
+    descargaActiva = false;
+  } else if (todasBajasUVPR && !descargaActiva) {
+    descargaActiva = true;
+  }
+
+  if (descargaActiva) {
+    ajustarCorrienteDesarga();
+  }
+}
+
+void ajustarCorrienteDesarga() {
+  static uint8_t valorPWM = 0;
+  if (lec[6] > 0){
+    return; //
+  }
+  float corrienteActual = abs(lec[6]);  // Valor absoluto de la corriente
+  float corrienteObjetivo = conf[6];  // DCP
+
+  if (abs(corrienteActual - corrienteObjetivo) < 100) {
+    return;
+  }
+
+  if (corrienteActual > corrienteObjetivo) {
+    valorPWM = min(255, valorPWM + 5);
+  } else {
+    valorPWM = max(0, valorPWM - 5);
+  }
+  
+  analogWrite(UVP_PIN, valorPWM);
+}
+
+void controlBalance() {
+  int contadorAltas = 0;
+  bool estadoBalance[6] = {false};
+  
+  // Contar baterías que necesitan balance
+  for (int i = 0; i < 6; i++) {
+    if (bat[i] > conf[4]) {  // VBal
+      contadorAltas++;
+      estadoBalance[i] = true;
+    }
+  }
+  
+  // Si todas necesitan balance, no activar ninguna
+  if (contadorAltas == 6) {
+    for (int i = 0; i < 6; i++) {
+      digitalWrite(B1_PIN + i, LOW);
+    }
+    return;
+  }
+  
+
+  // Activar balance para las baterías necesarias
+  digitalWrite(B1_PIN, estadoBalance[0] ? HIGH : LOW);
+  digitalWrite(B2_PIN, estadoBalance[1] ? HIGH : LOW);
+  digitalWrite(B3_PIN, estadoBalance[2] ? HIGH : LOW);
+  digitalWrite(B4_PIN, estadoBalance[3] ? HIGH : LOW);
+  digitalWrite(B5_PIN, estadoBalance[4] ? HIGH : LOW);
+  digitalWrite(B6_PIN, estadoBalance[5] ? HIGH : LOW);
+}
+
+void modoEmergencia() {
+  analogWrite(OVP_PIN, 255);  // Apagar carga
+  controlDescarga();  // Permitir descarga
+}
+
+void apagarTodo() {
+  analogWrite(OVP_PIN, 255);
+  analogWrite(UVP_PIN, 255);
+  apagarBalance();
+}
+
+void apagarBalance() {
   digitalWrite(B1_PIN, LOW);
   digitalWrite(B2_PIN, LOW);
   digitalWrite(B3_PIN, LOW);
@@ -324,118 +498,11 @@ void apagar() {
   digitalWrite(B6_PIN, LOW);
 }
 
-void control() {
-  for (int i = 0; i < 4; i++) {
-    Serial.print("bot ");
-    Serial.print(boton[i]);
-  }
-  Serial.println();
-  if (isTemperatureInvalid() || isEmergencyActive()) {
-    shutDownSystem();
-    return;
-  } else {
-    bool batteryStates[5] = { true, true, true, true, true };
-    bool balanceStates[6] = { false, false, false, false, false, false };
-    updateBatteryStates(batteryStates, balanceStates);
+//----------------------------------------------------------------control
 
-    handleCharging(batteryStates);
-    handleDischarging(batteryStates);
-    handleBalancing(balanceStates, batteryStates);
-  }
-}
 
-bool isTemperatureInvalid() {
-  return (lec[7] < conf[7]) || (lec[7] > conf[8]);
-}
 
-bool isEmergencyActive() {
-  return boton[3];
-}
 
-void shutDownSystem() {
-  apagar();
-  analogWrite(OVP_PIN, 255);
-  analogWrite(UVP_PIN, isTemperatureInvalid() ? 255 : 0);
-}
-
-void updateBatteryStates(bool batteryStates[], bool balanceStates[]) {
-  for (int i = 0; i < 6; i++) {
-    batteryStates[0] &= (bat[i] < conf[0]);
-    batteryStates[1] &= (bat[i] < conf[1]);
-    batteryStates[2] &= (bat[i] > conf[2]);
-    batteryStates[3] &= (bat[i] > conf[3]);
-    batteryStates[4] &= (bat[i] > conf[4]);
-    balanceStates[i] = (bat[i] > conf[4]);
-  }
-}
-
-void handleCharging(bool batteryStates[]) {
-  if (boton[0]) {
-    if (batteryStates[0] & batteryStates[1]) {
-      cc = 0;
-      analogWrite(OVP_PIN, cc);
-      //cc = ajuste(cc,conf[5],true);
-      bancc = false;
-    } else if (batteryStates[0] & !batteryStates[1]) {
-      if (!bancc) {
-        cc = 0;
-        analogWrite(OVP_PIN, cc);
-        //cc = ajuste(cc,conf[5],true);
-      } else {
-        cc = 255;
-        analogWrite(OVP_PIN, cc);
-      }
-    } else {
-      cc = 255;
-      analogWrite(OVP_PIN, cc);
-      bancc = true;
-    }
-  } else {
-    cc = 255;
-    analogWrite(OVP_PIN, cc);
-  }
-}
-
-void handleDischarging(bool batteryStates[]) {
-  if (boton[1]) {
-    if (batteryStates[2] & batteryStates[3]) {
-      dd = 0;
-      analogWrite(UVP_PIN, cc);
-      //dd = ajuste(dd,conf[6],false);
-      bandd = false;
-    } else if (batteryStates[2] & !batteryStates[3]) {
-      if (!bandd) {
-        dd = 0;
-        analogWrite(UVP_PIN, dd);
-        //dd = ajuste(dd,conf[6],false);
-      } else {
-        dd = 255;
-        analogWrite(UVP_PIN, dd);
-      }
-    } else {
-      dd = 255;
-      analogWrite(UVP_PIN, dd);
-      bandd = true;
-    }
-  } else {
-    dd = 255;
-    analogWrite(UVP_PIN, dd);
-  }
-}
-
-void handleBalancing(bool balanceStates[], bool batteryStates[]) {
-  if (boton[2] && !batteryStates[4] && (lec[6] > 350)) {
-    digitalWrite(B1_PIN, balanceStates[0] ? HIGH : LOW);
-    digitalWrite(B2_PIN, balanceStates[1] ? HIGH : LOW);
-    digitalWrite(B3_PIN, balanceStates[2] ? HIGH : LOW);
-    digitalWrite(B4_PIN, balanceStates[3] ? HIGH : LOW);
-    digitalWrite(B5_PIN, balanceStates[4] ? HIGH : LOW);
-    digitalWrite(B6_PIN, balanceStates[5] ? HIGH : LOW);
-
-  } else {
-    apagar();
-  }
-}
 
 //----------------------------------------------------------------contron ends
 
@@ -506,7 +573,7 @@ void Task1code(void* pvParameters) {
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
     // Ejecutar control()
     if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
-      control();
+      controlBaterias();
       //Serial.println("control");
       xSemaphoreGive(mutex);
     }

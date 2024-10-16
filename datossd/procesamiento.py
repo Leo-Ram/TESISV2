@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-10-08-sdata2"
+direccion = "datossd/2024-10-12-data1"
 
 nameColumn = ["B1", "B2", "B3", "B4", "B5", "B6", "I","T","VT","TIME"]
 df = pd.read_csv(direccion+".txt",delimiter=',',names=nameColumn)
@@ -25,21 +25,31 @@ df['PVT'] = (df['VT'] * df['I'])/1000
 reset_index = df['TIME'].dt.time.argmin()
 
 
-print(reset_index)
-
-if reset_index > 0:
-    # Calcular la diferencia de tiempo en el punto de reinicio
-    time_difference = df['TIME'].iloc[reset_index - 1] - df['TIME'].iloc[reset_index]
+# Función para detectar y corregir múltiples reseteos
+def corregir_reseteos(df):
+    # Calcular las diferencias de tiempo
+    time_diff = df['TIME'].diff()
     
-    # Ajustar los tiempos después del reinicio
-    df.loc[reset_index:, 'TIME'] += time_difference
+    # Detectar los reseteos (diferencias negativas en el tiempo)
+    reseteos = time_diff < pd.Timedelta(0)
+    
+    # Inicializar el tiempo acumulado
+    tiempo_acumulado = pd.Timedelta(0)
+    
+    # Iterar sobre los reseteos
+    for i in range(1, len(df)):
+        if reseteos.iloc[i]:
+            # Calcular la diferencia de tiempo en el punto de reseteo
+            diferencia = df['TIME'].iloc[i-1] - df['TIME'].iloc[i] + time_diff.iloc[i-1]
+            tiempo_acumulado += diferencia
+        
+        # Ajustar el tiempo
+        df.loc[i, 'TIME'] += tiempo_acumulado
+    
+    return df
 
-    # Asegurar que los intervalos se mantengan
-    time_intervals = df['TIME'].diff()
-    df.loc[reset_index:, 'TIME'] = df.loc[reset_index-1, 'TIME'] + time_intervals[reset_index:].cumsum()
-
-# para guardar la data procesada
-
+# Aplicar la corrección de reseteos
+df = corregir_reseteos(df)
 
 #print(df.head(10))
 

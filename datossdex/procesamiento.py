@@ -1,52 +1,59 @@
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import numpy as np
 
-from pandas import json_normalize
-os.system('cls' if os.name == 'nt' else 'clear')  
+# Limpiar la consola
+os.system('cls' if os.name == 'nt' else 'clear')
 
-direccion = "datossdex/2024-10-07-data1"
+# Definir la dirección del archivo
+direccion = "datossdex/2024-10-12-data1"
 
-nameColumn = ["VF","IF","VB","IB","VC","IC","TIME"]
-df = pd.read_csv(direccion+".txt",delimiter=',',names=nameColumn)
+# Definir los nombres de las columnas
+nameColumn = ["VF", "IF", "VB", "IB", "VC", "IC", "TIME"]
 
-df["IB"] = -(df["IB"])
+# Leer el archivo CSV
+df = pd.read_csv(direccion + ".txt", delimiter=',', names=nameColumn)
 
+# Invertir la corriente IB
+df["IB"] = -df["IB"]
+
+# Convertir la columna TIME a datetime
 df['TIME'] = pd.to_datetime(df['TIME'])
 
-df["PVF"] = df["VF"]*df['IF']/1000
+# Calcular las potencias
+df["PVF"] = df["VF"] * df['IF'] / 1000
+df["PVB"] = df["VB"] * df['IB'] / 1000
+df["PVC"] = df["VC"] * df["IC"] / 1000
 
-df["PVB"] = df["VB"]*df['IB']/1000
-
-df["PVC"] = df["VC"]*df["IC"]/1000
-
-
-#print(df.head(10))
-
-
-# Encontrar el índice donde ocurre el reinicio
-reset_index = df['TIME'].dt.time.argmin()
-
-
-print(reset_index)
-
-if reset_index > 0:
-    # Calcular la diferencia de tiempo en el punto de reinicio
-    time_difference = df['TIME'].iloc[reset_index - 1] - df['TIME'].iloc[reset_index]
+# Función para detectar y corregir múltiples reseteos
+def corregir_reseteos(df):
+    # Calcular las diferencias de tiempo
+    time_diff = df['TIME'].diff()
     
-    # Ajustar los tiempos después del reinicio
-    df.loc[reset_index:, 'TIME'] += time_difference
+    # Detectar los reseteos (diferencias negativas en el tiempo)
+    reseteos = time_diff < pd.Timedelta(0)
+    
+    # Inicializar el tiempo acumulado
+    tiempo_acumulado = pd.Timedelta(0)
+    
+    # Iterar sobre los reseteos
+    for i in range(1, len(df)):
+        if reseteos.iloc[i]:
+            # Calcular la diferencia de tiempo en el punto de reseteo
+            diferencia = df['TIME'].iloc[i-1] - df['TIME'].iloc[i] + time_diff.iloc[i-1]
+            tiempo_acumulado += diferencia
+        
+        # Ajustar el tiempo
+        df.loc[i, 'TIME'] += tiempo_acumulado
+    
+    return df
 
-    # Asegurar que los intervalos se mantengan
-    time_intervals = df['TIME'].diff()
-    df.loc[reset_index:, 'TIME'] = df.loc[reset_index-1, 'TIME'] + time_intervals[reset_index:].cumsum()
+# Aplicar la corrección de reseteos
+df = corregir_reseteos(df)
 
-# para guardar la data procesada
-
-
-#print(df.head(10))
-
-output_filename = direccion+"p"+".csv"
+# Guardar la data procesada
+output_filename = direccion + "p" + ".csv"
 df.to_csv(output_filename, index=False)
+
+print("Procesamiento completado. Archivo guardado como:", output_filename)
 

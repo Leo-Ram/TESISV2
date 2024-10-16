@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossd/2024-10-08-sdata2p"
+direccion = "datossd/2024-10-12-data1p"
 
 df = pd.read_csv(direccion+".csv")
 
@@ -33,12 +33,14 @@ def plot_variables_and_power(df, start_time, end_time):
         # Gráfico de la variable vs tiempo
         axs[idx, 0].plot(df_filtered['TIME'], df_filtered[var])
         axs[idx, 0].set_ylabel(var+"[V]")
+        axs[idx, 0].grid(True)
         if idx == 0:
             axs[idx, 0].set_title("V vs Tiempo")
 
         # Gráfico de I vs tiempo
         axs[idx, 1].plot(df_filtered['TIME'], df_filtered['I'])
         axs[idx, 1].set_ylabel('I[mA]')
+        axs[idx, 1].grid(True)
         if idx == 0:
             axs[idx, 1].set_title('I vs Tiempo')
 
@@ -46,6 +48,7 @@ def plot_variables_and_power(df, start_time, end_time):
         power_col = f'P{var}'
         axs[idx, 2].plot(df_filtered['TIME'], df_filtered[power_col])
         axs[idx, 2].set_ylabel(power_col+"[W]")
+        axs[idx, 2].grid(True)
         if idx == 0:
             axs[idx, 2].set_title("P vs Tiempo")
 
@@ -60,14 +63,14 @@ def plot_variables_and_power(df, start_time, end_time):
         ax.xaxis.set_major_locator(mdates.AutoDateLocator())
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
         ax.set_xlabel('Tiempo (HH:MM)')
-
     plt.tight_layout()
     plt.show()
 
 
 # Definir el intervalo de tiempo (ajusta estos valores según tus necesidades)
+# '2024-01-01 01:32:00' inicio descarga '2024-01-01 07:55:00'
 start_time = pd.to_datetime('2024-01-01 00:00:00')
-end_time = pd.to_datetime('2024-01-01 02:45:33')
+end_time = pd.to_datetime('2024-01-01 10:56:47')
 
 # Llamar a la función para crear los gráficos
 plot_variables_and_power(df, start_time, end_time)

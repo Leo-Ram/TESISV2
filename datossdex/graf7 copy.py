@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from pandas import json_normalize
 os.system('cls' if os.name == 'nt' else 'clear')  
 
-direccion = "datossdex/2024-10-07-data1p"
+direccion = "datossdex/2024-10-12-data1p"
 
 df = pd.read_csv(direccion+".csv")
 
@@ -17,7 +17,7 @@ df['TIME'] = pd.to_datetime(df['TIME'])
 
 # Definir el intervalo de tiempo (ajusta estos valores según tus necesidades)
 start_time = pd.to_datetime('2024-01-01 00:00:00')
-end_time = pd.to_datetime('2024-01-01 00:20:00')
+end_time = pd.to_datetime('2024-01-01 07:33:34')
 
 # Filtrar el DataFrame por el intervalo de tiempo especificado
 mask = (df['TIME'] >= start_time) & (df['TIME'] <= end_time)
